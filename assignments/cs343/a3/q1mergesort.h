@@ -2,24 +2,22 @@
 #define Q1MERGESORT_H
 
 template<typename T> _Task Mergesort {
-    static T *unsorted;
-    bool unsortedOwner;
-
     T *values;
     unsigned int low;
     unsigned int high;
     unsigned int depth;
 
+    T *unsorted;
+
     void main();
     void sort();
 
+    Mergesort(T values[], unsigned int low, unsigned int high,
+              unsigned int depth, T unsorted[]);
 public:
     Mergesort(T values[], unsigned int low, unsigned int high,
               unsigned int depth);
     ~Mergesort();
 };
-
-template<typename T>
-T *Mergesort<T>::unsorted;
 
 #endif

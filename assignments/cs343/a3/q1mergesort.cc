@@ -17,7 +17,7 @@ void Mergesort<T>::sort() {
     unsigned int pivot = (low + high) / 2;
     {
         if (depth > 0) {
-            Mergesort<T> rhs(values, pivot, high, depth - 1);
+            Mergesort<T> rhs(values, pivot, high, depth - 1, unsorted);
         } else {
             unsigned int currentLow = low;
             low = pivot;
@@ -49,17 +49,20 @@ void Mergesort<T>::sort() {
 
 template<typename T>
 Mergesort<T>::Mergesort(T values[], unsigned int low, unsigned int high,
+                        unsigned int depth, T unsorted[])
+        : values(values), low(low), high(high), depth(depth),
+          unsorted(unsorted) { }
+
+template<typename T>
+Mergesort<T>::Mergesort(T values[], unsigned int low, unsigned int high,
                         unsigned int depth)
         : values(values), low(low), high(high), depth(depth) {
-    unsortedOwner = (unsorted == NULL);
-    if (unsortedOwner) {
-        unsorted = new T[high - low];
-    }
+    unsorted = new T[high - low];
 }
 
 template<typename T>
 Mergesort<T>::~Mergesort() {
-    if (unsortedOwner) {
+    if (!low) {
         delete[] unsorted;
     }
 }
@@ -85,7 +88,7 @@ void uMain::main() {
                 try {
                     output = new std::ofstream(argv[3]);
                 } catch (uFile::Failure) {
-                    std::cerr << "Could not open output file '" << argv[2];
+                    std::cerr << "Could not open output file '" << argv[3];
                     std::cerr << "'." << std::endl;
                     exit(-1);
                 }
@@ -93,7 +96,7 @@ void uMain::main() {
                 try {
                     input = new std::ifstream(argv[2]);
                 } catch (uFile::Failure) {
-                    std::cerr << "Could not open input file '" << argv[1];
+                    std::cerr << "Could not open input file '" << argv[2];
                     std::cerr << "'." << std::endl;
                     exit(-1);
                 }
@@ -115,7 +118,7 @@ void uMain::main() {
             for (unsigned int i = 0; i < count; ++i) {
                 *input >> values[i];
                 *output << values[i];
-                if (i % 22 == 0 && i != 0) {
+                if ((i + 1) % 22 == 0) {
                     *output << std::endl << "  ";
                 } else {
                     *output << " ";
@@ -129,7 +132,7 @@ void uMain::main() {
 
             for (unsigned int i = 0; i < count; ++i) {
                 *output << values[i];
-                if (i % 22 == 0 && i != 0) {
+                if ((i + 1) % 22 == 0) {
                     *output << std::endl << "  ";
                 } else {
                     *output << " ";
