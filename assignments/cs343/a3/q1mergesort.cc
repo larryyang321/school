@@ -10,7 +10,7 @@ void Mergesort<T>::main() {
 
 template<typename T>
 void Mergesort<T>::sort() {
-    if (high - low == 1) {
+    if (high - low <= 1) {
         return;
     }
 
@@ -114,7 +114,12 @@ void uMain::main() {
             TYPE *values = new TYPE[count];
             for (unsigned int i = 0; i < count; ++i) {
                 *input >> values[i];
-                *output << values[i] << " ";
+                *output << values[i];
+                if (i % 22 == 0 && i != 0) {
+                    *output << std::endl << "  ";
+                } else {
+                    *output << " ";
+                }
             }
             *output << std::endl;
 
@@ -123,7 +128,12 @@ void uMain::main() {
             }
 
             for (unsigned int i = 0; i < count; ++i) {
-                *output << values[i] << " ";
+                *output << values[i];
+                if (i % 22 == 0 && i != 0) {
+                    *output << std::endl << "  ";
+                } else {
+                    *output << " ";
+                }
             }
             *output << std::endl << std::endl;
 
