@@ -17,7 +17,8 @@ void Mergesort<T>::sort() {
     unsigned int pivot = (low + high) / 2;
     {
         if (depth > 0) {
-            Mergesort<T> rhs(values, pivot, high, depth - 1, unsorted);
+            --depth;
+            Mergesort<T> rhs(values, pivot, high, depth, unsorted);
         } else {
             unsigned int currentLow = low;
             low = pivot;
@@ -27,9 +28,6 @@ void Mergesort<T>::sort() {
 
         unsigned int currentHigh = high;
         high = pivot;
-        if (depth > 0) {
-            --depth;
-        }
         sort();
         high = currentHigh;
     }
