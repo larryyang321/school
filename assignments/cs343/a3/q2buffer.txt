@@ -13,11 +13,15 @@ the busy-wait loop likely only spins a few times anyway.
 
 iv. /usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 100000 30 10
 
-       |   -O0 |   -O2
-----------------------
-BUSY   | 24.41 | 24.35
-NOBUSY | 28.21 | 28.09
+       |    -O0 |    -O2
+------------------------
+BUSY   |  97.64 |  97.40
+NOBUSY | 112.21 | 112.36
 
 v. The multiprocessor execution is much slower than the uniprocessor one.
 
-vi.
+vi. The multiprocessor user time should be larger than the uniprocessor time
+because it should count simultaneously for each thread; ie. with four threads
+it should be about four times as much. The reason we see a slowdown which is
+much greater than 4x is likely related to context switching across multiple
+processors causing us to lock much more often than on a uniprocessor.
