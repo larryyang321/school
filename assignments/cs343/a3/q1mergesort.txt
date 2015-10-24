@@ -1,0 +1,14 @@
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 0
+6.31u 0.07s 0:06.37
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 1
+6.74u 0.06s 0:06.40
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 2
+6.81u 0.05s 0:06.42
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 3
+6.80u 0.09s 0:06.44
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 4
+6.87u 0.06s 0:06.46
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 5
+6.91u 0.08s 0:06.47
+$ /usr/bin/time -f "%Uu %Ss %E" ./mergesort -t 100000000 6
+7.04u 0.08s 0:06.51

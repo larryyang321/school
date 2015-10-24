@@ -1,0 +1,6 @@
+$ make KIND=BUSY q2 && /usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 300000 30 10
+total: 1107087504
+24.59u 0.02s 0:24.59
+$ make KIND=NOBUSY q2 && /usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 300000 30 10
+total: 1107087504
+29.77u 0.01s 0:29.75

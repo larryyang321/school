@@ -1,0 +1,9 @@
+Params: 4 6 18000
+
+        | No Opt |    -O2
+-------------------------
+fixups  | 10.93s |  2.25s
+resumes | 82.37s | 54.52s
+
+The fixups version is likely much faster since simply executing a function is
+extremely cheap and doesn't involve passing objects around.

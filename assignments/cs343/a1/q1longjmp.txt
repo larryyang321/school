@@ -1,0 +1,9 @@
+Params: 50 3800 3 4
+
+          | No Opt |    -O2
+---------------------------
+longjmp   | 10.80s | 10.24s
+try-catch | 97.32s | 99.42s
+
+The original program likely takes much longer than the longjmp version since
+the usage of try-catch requires a lot of overhead.

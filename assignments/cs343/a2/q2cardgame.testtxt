@@ -1,0 +1,66 @@
+q3utf8 TEST DOCUMENTATION
+=========================
+This program examines cardgame input and determines its validity.
+
+USER INTERRFACE TESTING
+    There is no user interface to be tested, so the testing focuses solely on
+    the algorithm used for the conversion.
+
+ALGORITHM TESTING
+
+  TEST 1:
+  -------
+    DATA DESCRIPTION
+    The binary is called with parameters: `3 5`
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1   Players: 5    Cards: 128
+    2   P0      P1      P2      P3      P4
+    3   6:111<* 4:117<  7:121<          7:104>
+    4   8:96>   2:94>   8:86>*  1:85<
+    5                   3:82>X  2:80>*  7:73<X
+    6   1:58>   6:59<X          8:65<*
+    7   3:50>                   5:53<*
+    8   #47#                    3:47<X
+    9
+    10
+    11  Players: 8    Cards: 86
+    12  P0      P1      P2      P3      P4      P5      P6      P7
+    13          8:78>   6:72>*  1:71<
+    14                  5:66>*  1:65<
+    15  1:21<   3:52>X  5:60>X  5:55<X  8:44>   8:36>   6:30>*  8:22>X
+    16                                          1:14>X  6:15<*
+    17  7:1<                                            6:8>*
+    18                                                  1:0#
+    19
+    20
+    21  Players: 3    Cards: 109
+    22  P0      P1      P2
+    23  1:104>X 4:105<*
+    24          1:103<* 8:95<
+    25          5:90>X  #90#X
+
+    ANALYSIS
+    The results from running the program with these parameters show that:
+    1) The correct formatting is observed
+    2) Players can win from being the only player remaining (lines 8 and 25)
+    3) Players can win by taking the last cards (line 18)
+    4) Players who die are removed from the game (lines 5, 6, 15, and 16)
+    5) Players can die in the same turn they win (line 25)
+
+    From this we can say that each requirement has been observed.
+
+  TEST 2:
+  -------
+    DATA DESCRIPTION
+    The binary is called with parameters: `1 0`
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1   Error: seed value must be positive.
+
+    ANALYSIS
+    An error message is shown when the parameters are invalid.

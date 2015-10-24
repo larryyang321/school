@@ -1,0 +1,48 @@
+Q3
+==
+
+Part A:
+
+    $ for i in {1..10}; do ./q3uni 10000000; done
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    shared:20000000
+    $ for i in {1..10}; do ./q3multi 10000000; done
+    shared:14036755
+    shared:10588226
+    shared:10213628
+    shared:10214193
+    shared:10274018
+    shared:10305401
+    shared:10276557
+    shared:10133824
+    shared:10355183
+    shared:10467201
+
+Part B:
+
+No, since there is no guarantee of the execution order of tasks instances.
+
+Part C:
+
+The smallest number that could be printed is 2 since in theory both threads
+could read in `0`, thread A could run 10000000 - 1 times and store value
+`9999999`, then thread B could run once and store value `1`, then thread A
+could read in `1`, then thread B could run to completion, then thread A could increment `1` and store `2` in `shared`.
+
+The largest number is 20000000 since each thread could alternate and see the
+newly updated value from the other thread, thus behaving exactly like a
+uniprocessor.
+
+Part D:
+
+The multiprocessor output tends to be approximately half of the uniprocessor
+output. This implies the multiprocessor tasks run approximately simultaneously,
+but not quite.

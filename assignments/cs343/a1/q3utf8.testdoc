@@ -1,0 +1,91 @@
+q3utf8 TEST DOCUMENTATION
+=========================
+This program examines utf8 input and determines its validity.
+
+USER INTERRFACE TESTING
+    There is no user interface to be tested, so the testing focuses solely on
+    the algorithm used for the conversion.
+
+ALGORITHM TESTING
+
+  TEST 1:
+  -------
+    DATA DESCRIPTION
+    The first input file (generated from q3gen.cc), is "utf8input". See the
+    makefile of details.
+
+        1   0x23, '\n',
+        2   0x23, 0x23, '\n',
+        3   0xd7, 0x90, '\n',
+        4   0xd7, '\n',
+        5   0xc2, 0xA3, '\n',
+        6   '\n',
+        7   0xb0, '\n',
+        8   0xe0, 0xe3, '\n',
+        9   0xe9, 0x80, 0x80, '\n'
+        10  0xe9, 0x80, 0x80, 0xff, 0xf8, '\n',
+        11  0xe0, 0x93, 0x90, '\n',
+        12  0xff, 0x9A, 0x84, '\n',
+        13  0xf0, 0x90, 0x89, '\n',
+        14  0xf0, 0x90, 0x89, 0x80, '\n',
+        15  0x01, '\n'
+
+    Line 1 is used to verify that ASCII characters are recognized. Line 2 is
+    used to verify that extra characters after ASCII characters are recognized.
+    Lines 3 and 5 are used to verify that 2-byte utf8 characters are recognized.
+    Lines 4, 8, and 13 are used to verify that missing bytes are recognized as
+    errors. Line 6 is used to verify that empty lines produce an empty line
+    warning. Line 7 is used to verify that single bytes without a utf8 header
+    are recognized as errors. Lines 9 and 10 is used to verify that 3-byte utf8
+    characters are recognized, with and without extra trailing bytes. Line 11
+    is used to verify our program enforced minimal encoding as a validation
+    strategy. Line 12 is used to verify that the first utf8 byte is checked.
+    Line 14 is used to verify that 4-byte utf8 characters are recognized. Line
+    15 is sued to verify the minimal encoding check allows the smallest
+    possible character.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1   0x23 : valid 0x23
+    2   0x23 : valid 0x23. Extra characters 0x23
+    3   0xd790 : valid 0x5d0
+    4   0xd7 : invalid
+    5   0xc2a3 : valid 0xa3
+    6    : Warning! Blank line.
+    7   0xb0 : invalid
+    8   0xe0e3 : invalid
+    9   0xe98080 : valid 0x9000
+    10  0xe98080 : valid 0x9000. Extra characters 0xfff8
+    11  0xe09390 : invalid
+    12  0xff : invalid. Extra characters 0x9a84
+    13  0xf09089 : invalid
+    14  0xf0908980 : valid 0x10240
+    15  0x1 : valid 0x1
+
+    ANALYSIS
+    The results from running the program on "utf8input" show that:
+    1) All 1-byte characters are recognized (lines 1, 2, and 15).
+    2) All 2-byte characters are recognized (lines 3 and 5)
+    3) All 3-byte characters are recognized (lines 9 and 10)
+    4) All 4-byte characters are recognized (line 14)
+    5) All valid characters show trailing characters (lines 2 and 10)
+    6) All invalid characters show trailing characters (line 12)
+    7) All invalid cases are recognized (lines 4, 7, 8, 11, 12, and 13)
+    8) Empty lines are recognized (line 6)
+
+    From this we can say that each condition in the main loop has been
+    exercised, and the basic conversion algorithm has been shown to be correct.
+
+  TEST 2:
+  -------
+    DATA DESCRIPTION
+    "empty", is an empty input file.  It is used to verify that the end
+    of file is detected correctly, and no extraneous output is generated.
+
+    TESTING
+    There was no test output.
+
+    ANALYSIS
+    The lack of output shows the program did not generate extraneous output.
+    Thus the basic input processing algorithm is shown to be correct.

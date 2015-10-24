@@ -1,0 +1,108 @@
+\documentclass[12pt]{article}
+\usepackage[letterpaper, hmargin=0.75in, vmargin=0.75in]{geometry}
+\usepackage{courier,float,graphicx,listings,tikz,url,verbatimbox}
+
+\lstset{basicstyle=\footnotesize\ttfamily}
+
+\usetikzlibrary{arrows,automata,shapes}
+\tikzstyle{block} = [rectangle, draw, fill=blue!20,
+    text width=5em, text centered, rounded corners, minimum height=2em]
+
+
+\begin{document}
+\title{SE465-001\\Assignment 3}
+\author{Kevin Carruthers (20463098), {\tt kcarruth@uwaterloo.ca}}
+\date{March 30, 2015}
+\maketitle
+
+\section*{Question 1}
+% p = (a ∧ b) ∨ (b ∧ c) ∨ (a ∧ c)
+% p_a = b xor c
+% p_b = a xor c
+% p_c = a xor b
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c||c||c|c|c|}
+\hline
+  & a & b & c & p & $p_a$ & $p_b$ & $p_c$ \\ \hline
+2 & T & T & F & T & T     & T     & F     \\ \hline
+3 & T & F & T & T & T     & F     & T     \\ \hline
+6 & F & T & F & F & T     & F     & T     \\ \hline
+7 & F & F & T & F & T     & T     & F     \\ \hline
+1 & T & T & T & T & F     & F     & F     \\ \hline
+4 & T & F & F & F & F     & T     & T     \\ \hline
+5 & F & T & T & T & F     & T     & T     \\ \hline
+8 & F & F & F & F & F     & F     & F     \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{GACC.} Pairs of rows that satisfy GACC: For $p_a$, we can select any of $\{(2, 5), (2, 8), (3, 5), (3, 8)\}$. For $p_b$, we can select any of $\{(2, 3), (2, 8), (5, 3), (5, 8)\}$. For $p_c$, we can select any of $\{(3, 2), (3, 8), (5, 2), (5, 8)\}$.
+\paragraph{CACC.} Pairs of rows that satisfy CACC: For $p_a$, we can select any of $\{(2, 5), (2, 8), (3, 5), (3, 8)\}$. For $p_b$, we can select any of $\{(2, 3), (2, 8), (5, 3), (5, 8)\}$. For $p_c$, we can select any of $\{(3, 2), (3, 8), (5, 2), (5, 8)\}$.
+\paragraph{RACC.} Pairs of rows that satisfy RACC: There are no valid test combinations for any of our predicates $p_a, p_b, p_c$.
+
+
+\section*{Question 2}
+\paragraph{size of s2, completeness.} No: \ttfamily{s2 = null;}\rmfamily{}.
+\paragraph{size of s2, disjointness.} Yes.
+\paragraph{relation, completeness.} Yes.
+\paragraph{relation, disjointnessness.} No. \ttfamily{s1 = \{1, 2, 3\}, s2 = \{1, 2, 3\}}\rmfamily{}.
+\paragraph{Base choice TRs.} Since there are two characteristics which each have two partitions, there would result four test requirements.
+
+
+\section*{Question 3}
+\paragraph{Mozilla bug.} Problems with this report:
+\begin{description}
+\item [Title is unclear]: What does the bugreport author mean by ``shown wrong''.
+\item [Description is unclear]: The bugreport author uses unclear language, eg. what does ``address of the first one for each of the others'' mean?
+\item [No expected results]: The author listed only the actual results, not what he should be expecting.
+\item [No version information]: The author did not include the version number of the product showing the issue.
+\end{description}
+
+To improve the quality of this report, we should fix the above issues. A better report would be:
+\begin{verbnobox}[\scriptsize]
+Title:
+Incorrect recipient addresses are listed when mail is sent to multiple recipients.
+
+Description:
+When sending mail to multiple recipients either directly or by cc'ing them, Mozilla Mail
+only shows the first address for each recipient, as opposed to the address it was sent to.
+
+Reproducible: Always
+Steps to Reproduce:
+1. Create user with email addresses: <random_address@email.com>, <your_email@email.com>.
+2. Send message to <your_email@email.com>.
+3. Open the recieved message in Mozilla Mail.
+4. Look at the recipients-list.
+Expected Results: <your_email@email.com>
+Actual Results: <random_address@email.com>
+
+This bug was found in build 2001112104.
+\end{verbnobox}
+
+\paragraph{HashTable bug report.}
+\begin{verbnobox}[\scriptsize]
+Title:
+HashTable put function does not update existing element.
+
+Description:
+When `put`ing an element which already exists, the associated element is not updated.
+
+Reproducible: Always
+Steps to Reproduce:
+1. Create a hashtable with size >= 1
+2. Put a key-value pair into the table.
+3. Put a key-value pair with the same key and a different value.
+4. Examine the table.
+Expected Results: table contains: key-new_value
+Actual Results: table contains: key-old_value
+
+Test Code:
+HashTable table = new HashTable(1);
+table.put(new Integer(3), new Integer(7));
+table.put(new Integer(3), new Integer(42));
+table.output();
+Expected: 3-42
+Actual: 3-7
+\end{verbnobox}
+
+\end{document}
