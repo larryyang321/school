@@ -9,5 +9,6 @@ a2_sub.pdf: a2_sub.tex blockCFG.png defuseCFG.png
 
 
 clean:
-	rm -f a2_sub.pdf
+	rm -f *.pdf
+	rm -f *.png
 	make -C q2 clean

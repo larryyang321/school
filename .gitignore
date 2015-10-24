@@ -1,0 +1,5 @@
+.sass-cache
+
+*.class
+*.d
+*.o
