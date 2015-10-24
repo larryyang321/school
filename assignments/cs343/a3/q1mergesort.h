@@ -20,4 +20,8 @@ public:
     ~Mergesort();
 };
 
+unsigned int uDefaultStackSize() {
+    return 512 * 1000;
+}
+
 #endif
