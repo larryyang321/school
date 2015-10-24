@@ -71,10 +71,11 @@ Consumer::Consumer(BoundedBuffer<BTYPE> &buffer, const int delay,
         : buffer(buffer), delay(delay), sentinel(sentinel), sum(sum) { }
 
 void Consumer::main() {
+    BTYPE element;
     for (;;) {
         yield((*mprng)(delay - 1));
 
-        BTYPE element = buffer.remove();
+        element = buffer.remove();
         if (element == sentinel) {
             break;
         }
@@ -91,8 +92,7 @@ void Producer::main() {
     for (int i = 1; i <= produce; ++i) {
         yield((*mprng)(delay - 1));
 
-        BTYPE element = BTYPE(i);
-        buffer.insert(element);
+        buffer.insert(BTYPE(i));
     }
 }
 
@@ -102,35 +102,35 @@ void uMain::main() {
     switch (argc) {
         case 6:
             delay = std::stoi(argv[5]);
-            if (delay < 0) {
+            if (delay <= 0) {
                 std::cerr << "Error: delay value must be non-negative.";
                 std::cerr << std::endl;
                 exit(-1);
             }
         case 5:
             buffersize = std::stoi(argv[4]);
-            if (buffersize < 0) {
+            if (buffersize <= 0) {
                 std::cerr << "Error: buffersize value must be non-negative.";
                 std::cerr << std::endl;
                 exit(-1);
             }
         case 4:
             produce = std::stoi(argv[3]);
-            if (produce < 0) {
+            if (produce <= 0) {
                 std::cerr << "Error: produce value must be non-negative.";
                 std::cerr << std::endl;
                 exit(-1);
             }
         case 3:
             prods = std::stoi(argv[2]);
-            if (prods < 0) {
+            if (prods <= 0) {
                 std::cerr << "Error: producers value must be non-negative.";
                 std::cerr << std::endl;
                 exit(-1);
             }
         case 2:
             cons = std::stoi(argv[1]);
-            if (cons < 0) {
+            if (cons <= 0) {
                 std::cerr << "Error: consumers value must be non-negative.";
                 std::cerr << std::endl;
                 exit(-1);
@@ -147,6 +147,10 @@ void uMain::main() {
     if (delay == -1) {
         delay = cons + prods;
     }
+
+    #ifdef __U_MULTI__
+        uProcessor p[3] __attribute__(( unused ));
+    #endif
 
     mprng = new MPRNG();
 

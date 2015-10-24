@@ -1,6 +1,23 @@
-/usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 100000 30 10
+i. /usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 100000 30 10
 
        |   -O0 |  -O2
 ---------------------
 BUSY   |  9.05 | 8.28
-NOBUSY | 11.98 | 9.89
+NOBUSY | 11.84 | 9.89
+
+ii. Busy-waiting is faster than no-busy-waiting, and with optimization is faster
+than without.
+
+iii. Busy-waiting is likely faster since it requires less context-switching and
+the busy-wait loop likely only spins a few times anyway.
+
+iv. /usr/bin/time -f "%Uu %Ss %E" ./buffer 50 55 100000 30 10
+
+       |   -O0 |   -O2
+----------------------
+BUSY   | 24.41 | 24.35
+NOBUSY | 28.21 | 28.09
+
+v. The multiprocessor execution is much slower than the uniprocessor one.
+
+vi.
