@@ -1,0 +1,45 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,parskip,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\hypersetup{colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{CS 348 --- Assignment 3}
+\author{Kevin Carruthers}
+\date{\vspace{-2ex}Fall 2015}
+\maketitle\HRule
+
+\section{Question 1}
+\[ \pi_{name}(Employee * Loan * (\sigma_{publisher='McGraw-Hill' | publisher='Wesley'} Books)) \]
+
+Explanation: first we filter all books by those which have a publisher we find relevant. We join this with loans and then with employees to get the employees which have loaned any of these books. Finally, we take only the name attribute.
+
+\section{Question 2}
+\[ \pi_{e1, e2, isbn} \sigma_{e1 < e2} (\mathcal{P}_{L(e1, isbn, d, r)} Loan * \mathcal{P}_{L(e2, isbn, d, r)} Loan) \]
+
+Explanation: we first join the loans with themselves, mapping the employee numbers to e1 and e2, respectively. Then, we simply take any of these results wherein e1 is less than e2 to ensure they are not equal and there are no duplicate results (ie. in reversed order). Finally, we take only the e1, e2, and isbn attributes.
+
+\section{Question 3}
+\[ \pi_{empno, age} (Employee - \pi_{empno, age} (\sigma_{age < age2} (Employee \times \mathcal{P}_{E(empno, n, o, age2)} Employee)) \]
+
+Explanation: we begin by taking the cartesian product of employees with itself, making sure we make the latter's age to age2. Then, we filter the result of that operation such that age is less than age2. We then subtract this table from the employees table and return the empno and age from the result.
+
+\section{Question 4}
+\begin{align*}
+agathaBooks &= \sigma_{author='Agatha Christie'} Books \\
+agathaEmployee &= \pi_{empno,isbn} (agathaBooks * Loan * Employee) \\
+allPossible &= \pi_{empno,isbn} (agathaBooks \times Employee) \\
+\pi_{name} (\pi_{empno} Employee - \pi_{empno} &(allPossible - agathaEmployee) * Employee)
+\end{align*}
+
+Explanation: we define the set of all Agatha Christie books by filtering books by those with an author or Agatha Christie. The set of all employees that have loaned any number of Agatha Christie books, then, is simply the set of Agatha Christie books joined with loans and employees. The set of all possible combinations of employees and Agatha Christe books is clearly the cartesian product of the set of Agatha Christie books and employees. Thus, the set off all possible combinations minus the set of employees who have loaned some Agatha Christie books gives all the employees who have rented some but not all of her books. By subtracting this (joined with employees) from the employees table, we are clearly left with its inverse, ie. the set of all employees that {\bf have} loaned all Agatha Christie books. By returning only the name attribute of this table, we fulfil the question requirements.
+
+\end{document}
