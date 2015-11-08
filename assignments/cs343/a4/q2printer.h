@@ -5,11 +5,11 @@
 
 struct PrinterInfo {
     Voter::States state;
+    TallyVotes::Tour vote;
+    unsigned int numBlocked;
 
-    TallyVotes::Tour vote = TallyVotes::Tour::NONE;
-    unsigned int numBlocked = -1;
-
-    PrinterInfo(Voter::States state) : state(state) { }
+    PrinterInfo(Voter::States state)
+            : state(state), vote(TallyVotes::Tour::NONE), numBlocked(-1) { }
 };
 
 _Monitor Printer {

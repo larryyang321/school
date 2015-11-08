@@ -1,5 +1,5 @@
 KIND := HEAP
-TYPE := SEM
+TYPE := BAR
 
 UXX = `which u++`
 CXXFLAGS = -g -multi -Wall -Wno-unused-label -O2 -DIMPLTYPE_"${TYPE}"

@@ -5,7 +5,21 @@
 #include "q2voter.h"
 
 std::ostream& operator<< (std::ostream &o, const PrinterInfo& info) {
-    o << "Yo!";
+    o << (char)info.state;
+
+    switch(info.state) {
+        case Voter::States::Start:
+        case Voter::States::Complete:
+            break;
+        case Voter::States::Vote:
+            o << " " << (info.vote == 0 ? "p" : "s");
+            break;
+        case Voter::States::Block:
+        case Voter::States::Unblock:
+        case Voter::States::Finished:
+            o << " " << info.numBlocked;
+            break;
+    }
 
     return o;
 }
@@ -26,8 +40,9 @@ Printer::Printer(unsigned int voters) : voters(voters) {
 }
 
 Printer::~Printer() {
-    // TODO: bad!
     flush();
+    std::cout << "=================" << std::endl;
+    std::cout << "All tours started" << std::endl;
 
     delete[] info;
 }

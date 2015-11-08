@@ -9,7 +9,12 @@ _Monitor Printer;
 class TallyVotes {
 
 #elif defined(IMPLTYPE_BAR)
+#include <uBarrier.h>
 _Cormonitor TallyVotes : public uBarrier {
+    unsigned int countPicture;
+    unsigned int countStatue;
+
+    void last();
 
 #elif defined(IMPLTYPE_SEM)
 class TallyVotes {
@@ -20,6 +25,8 @@ class TallyVotes {
 
     unsigned int group;
     Printer &printer;
+
+    unsigned int result;
 
 public:
     TallyVotes(unsigned int group, Printer &printer);

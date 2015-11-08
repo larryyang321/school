@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "MPRNG.h"
+
 #include "q2printer.h"
 #include "q2tallyVotes.h"
 #include "q2voter.h"
