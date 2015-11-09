@@ -2,9 +2,11 @@
 #include "q2tallyVotes.h"
 #include "q2voter.h"
 
+#ifdef IMPLTYPE_BAR
 TallyVotes::TallyVotes(unsigned int group, Printer &printer)
         : uBarrier(group), countPicture(0), countStatue(0), group(group),
-          printer(printer) { }
+          printer(printer) {
+}
 
 TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     printer.print(id, Voter::States::Vote, ballot);
@@ -31,3 +33,4 @@ void TallyVotes::last() {
     result = (countPicture > countStatue) ? 0 : 1;
     countPicture = countStatue = 0;
 }
+#endif

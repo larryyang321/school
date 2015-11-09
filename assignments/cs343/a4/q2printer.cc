@@ -12,11 +12,11 @@ std::ostream& operator<< (std::ostream &o, const PrinterInfo& info) {
         case Voter::States::Complete:
             break;
         case Voter::States::Vote:
+        case Voter::States::Finished:
             o << " " << (info.vote == 0 ? "p" : "s");
             break;
         case Voter::States::Block:
         case Voter::States::Unblock:
-        case Voter::States::Finished:
             o << " " << info.numBlocked;
             break;
     }
@@ -40,7 +40,6 @@ Printer::Printer(unsigned int voters) : voters(voters) {
 }
 
 Printer::~Printer() {
-    flush();
     std::cout << "=================" << std::endl;
     std::cout << "All tours started" << std::endl;
 
@@ -86,4 +85,18 @@ void Printer::print(unsigned int id, Voter::States state,
 
     info[id] = new PrinterInfo(state);
     info[id]->numBlocked = numBlocked;
+
+    if (state == Voter::States::Finished) {
+        for (unsigned int i = 0; i < voters; ++i) {
+            if (i == id) {
+                std::cout << *info[i] << "\t";
+
+                delete info[i];
+                info[i] = NULL;
+            } else {
+                std::cout << "...\t";
+            }
+        }
+        std::cout << std::endl;
+    }
 }

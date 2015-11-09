@@ -8,10 +8,9 @@ Voter::Voter(unsigned int id, TallyVotes &voteTallier, Printer &printer)
         : id(id), voteTallier(voteTallier), printer(printer) { }
 
 void Voter::main() {
-    printer.print(id, Voter::States::Start);
-
     yield(mprng(19));
 
+    printer.print(id, Voter::States::Start);
     TallyVotes::Tour ballot = TallyVotes::Tour(mprng(1));
     voteTallier.vote(id, ballot);
 }

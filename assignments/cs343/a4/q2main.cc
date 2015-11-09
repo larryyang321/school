@@ -41,7 +41,7 @@ void uMain::main() {
     mprng.seed(seed);
 
     Printer printer(V);
-    TallyVotes tallyVotes(V, printer);
+    TallyVotes tallyVotes(G, printer);
 
     Voter *voter[V];
     for (int i = 0; i < V; ++i) {
