@@ -1,0 +1,62 @@
+Q2 TEST DOCUMENTATION
+=========================
+This program tallies votes across multiple tasks in varying group sizes.
+
+USER INTERRFACE TESTING
+    There is no user interface to be tested, so the testing focuses solely on
+    the algorithm used for the conversion.
+
+ALGORITHM TESTING
+
+  TEST 1:
+  -------
+    DATA DESCRIPTION
+    The binary is called with paramters `9 3`
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.    Voter0  Voter1  Voter2  Voter3  Voter4  Voter5  Voter6  Voter7  Voter8
+    2.    ======= ======= ======= ======= ======= ======= ======= ======= =======
+    3.                                                                    S
+    4.                                                                    V p
+    5.            S                                                       B 1
+    6.            V p
+    7.            B 2                                     S
+    8.                                                    V p
+    9.                                                    C
+    10.   ...     ...     ...     ...     ...     ...     F p     ...     ...
+    11.                                                                   U 1
+    12.   ...     ...     ...     ...     ...     ...     ...     ...     F p
+    13.           U 0
+    14.   ...     F p     ...     ...     ...     ...     ...     ...     ...
+    15.                   S
+    16.                   V p
+    17.                   B 1             S
+    18.                                   V s
+    19.   S                               B 2
+    20.   V p
+    21.   C
+    22.   F p     ...     ...     ...     ...     ...     ...     ...     ...
+    23.                   U 1
+    24.   ...     ...     F p     ...     ...     ...     ...     ...     ...
+    25.                                   U 0
+    26.   ...     ...     ...     ...     F p     ...     ...     ...     ...
+    27.                           S
+    28.                           V p
+    29.                           B 1             S
+    30.                                           V p
+    31.                                           B 2             S
+    32.                                                           V s
+    33.                                                           C
+    34.   ...     ...     ...     ...     ...     ...     ...     F p     ...
+    35.                           U 1
+    36.   ...     ...     ...     F p     ...     ...     ...     ...     ...
+    37.                                           U 0
+    38.   ...     ...     ...     ...     ...     F p     ...     ...     ...
+    39.   =================
+    40.   All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct.

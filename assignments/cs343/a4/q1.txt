@@ -1,5 +1,18 @@
+Q1
+==
 times = 15000000000
 
       | 1 task          | 2 tasks         | 4 tasks
 HEAP  | 101.90u 1:41.84 | 967.47u 8:04.75 | 5921.72u 27:30.74
 STACK |   3.58u 0:03.57 |   7.31u 0:03.65 |   15.97u  0:04.08
+
+> Explain the relative differences in the timing results with respect to scaling
+the number of tasks for each version.
+Upon adding more tasks, the overall time increases. Furthermore, the user time
+becomes approximately equal to real time times the number of tasks.
+
+> Very briefly (2-4 sentences) speculate on the performance between the two
+versions.
+The heap version likely takes significantly longer because it allocates huge
+amounts of memory for each iteration. The stack version, on the other hand, only
+needs to allocate a single pointer.

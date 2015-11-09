@@ -11,6 +11,7 @@ void Voter::main() {
     yield(mprng(19));
 
     printer.print(id, Voter::States::Start);
+
     TallyVotes::Tour ballot = TallyVotes::Tour(mprng(1));
     voteTallier.vote(id, ballot);
 }

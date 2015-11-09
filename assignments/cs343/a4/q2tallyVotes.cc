@@ -12,6 +12,7 @@ TallyVotes::~TallyVotes() { }
 TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     exclusion.acquire();
 
+    // prime barge lock
     if (barging) {
         bargeLock.wait(exclusion);
     }
@@ -26,6 +27,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     if (waiters == group - 1) {
         printer.print(id, Voter::States::Complete);
     } else {
+        // barge
         if (bargeLock.empty()) {
             barging = false;
         } else {
@@ -36,6 +38,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
         blockedLock.wait(exclusion);
         printer.print(id, Voter::States::Unblock, --waiters);
 
+        // clear barge flag when no tasks are blocks
         if (blockedLock.empty()) {
             barging = false;
         }
@@ -45,10 +48,12 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     countPicture = countStatue = 0;
 
     if (blockedLock.empty()) {
+        // barge
         if (!bargeLock.empty()) {
             bargeLock.signal();
         }
     } else {
+        // unblock waitings tasks, enable barging
         barging = true;
         blockedLock.signal();
     }
@@ -75,6 +80,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     }
 
     if (waiters() == total() - 1) {
+        // complete the barrier (last waiter)
         uBarrier::block();
         printer.print(id, Voter::States::Complete);
     } else {
@@ -96,8 +102,10 @@ void TallyVotes::last() {
 TallyVotes::TallyVotes(unsigned int group, Printer &printer)
         : waiters(0), group(group), printer(printer), countPicture(0),
           countStatue(0), result(0) {
+    // initialize array of waiting task_ids
     waiterIds = new unsigned int[group];
 
+    // initialize array of "locks" for each waiting task
     taskLocks = new uSemaphore*[group];
     for (unsigned int i = 0; i < group; ++i) {
         taskLocks[i] = new uSemaphore(0);
@@ -124,12 +132,14 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
     }
 
     if (waiters == group - 1) {
+        // final task: determine result, print finished, wake waiting tasks
         result = (countPicture > countStatue) ? 0 : 1;
         countPicture = countStatue = 0;
 
         printer.print(id, Voter::States::Complete);
         printer.print(id, Voter::States::Finished, TallyVotes::Tour(result));
 
+        // finish all waiting tasks
         for (unsigned int i = 0; i < group - 1; ++i) {
             printer.print(waiterIds[i], Voter::States::Unblock, group - i - 2);
             printer.print(waiterIds[i], Voter::States::Finished,
@@ -142,6 +152,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, TallyVotes::Tour ballot) {
         exclusion.V();
     } else {
         printer.print(id, Voter::States::Block, waiters + 1);
+        // sleep until all tasks are done
         waiterIds[waiters] = id;
         taskLocks[waiters++]->P(exclusion);
     }
