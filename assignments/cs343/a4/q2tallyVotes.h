@@ -7,6 +7,12 @@ _Monitor Printer;
 
 #if defined(IMPLTYPE_MC)
 class TallyVotes {
+    uOwnerLock exclusion;
+    uCondLock bargeLock;
+    uCondLock blockedLock;
+
+    bool barging;
+    unsigned int waiters;
 
 #elif defined(IMPLTYPE_BAR)
 #include <uBarrier.h>
@@ -16,11 +22,11 @@ _Cormonitor TallyVotes : public uBarrier {
 #elif defined(IMPLTYPE_SEM)
 #include <uSemaphore.h>
 class TallyVotes {
-    uSemaphore critical_lock;
-    uSemaphore **task_lock;
+    uSemaphore exclusion;
+    uSemaphore **taskLocks;
 
-    unsigned int count;
-    unsigned int *taskIds;
+    unsigned int waiters;
+    unsigned int *waiterIds;
 
 #else
     #error unsupported voter type

@@ -75,16 +75,6 @@ void Printer::print(unsigned int id, Voter::States state,
 
     info[id] = new PrinterInfo(state);
     info[id]->vote = vote;
-}
-
-void Printer::print(unsigned int id, Voter::States state,
-                    unsigned int numBlocked) {
-    if (info[id]) {
-        flush();
-    }
-
-    info[id] = new PrinterInfo(state);
-    info[id]->numBlocked = numBlocked;
 
     if (state == Voter::States::Finished) {
         for (unsigned int i = 0; i < voters; ++i) {
@@ -99,4 +89,14 @@ void Printer::print(unsigned int id, Voter::States state,
         }
         std::cout << std::endl;
     }
+}
+
+void Printer::print(unsigned int id, Voter::States state,
+                    unsigned int numBlocked) {
+    if (info[id]) {
+        flush();
+    }
+
+    info[id] = new PrinterInfo(state);
+    info[id]->numBlocked = numBlocked;
 }
