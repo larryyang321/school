@@ -1,0 +1,110 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\hypersetup{colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{CS 348 --- Assignment 5}
+\author{Kevin Carruthers}
+\date{\vspace{-2ex}Fall 2015}
+\maketitle\HRule
+
+\section{Program Design}
+This program first creates a connection to the database and builds the prepared statement to be executed upon that database. By doing this first, we eliminate the need to recreate this connection for each user query. Then, the system enters a user-input loop: it requests the required user information, runs the prepared query with that information, and prints the results. This continues until the user tells the system to ``exit''.
+
+\subsection{Justification}
+The above methodology (eg. creating the connection and query on start and reusing it each time) was chosen to reduce the wait time between subsequent queries at the expense of a slower load time. This is considered acceptable since the case where a user runs the program but does not execute a query is deemed unimportant to standard operating flow.
+
+The query was formulated as follows: a common table expression is created with the enrollments data (eg. number of enrolled students and the various mark data such as totals and min/max averages) as that table will be used in the main query. The main query then joins the class table with this ``averages'' CTE as well as the professor and course data such that it can formulate the required outputs. This query limits the results to those within the date range supplied with a professor in the supplied department.
+
+By designing the query like this (ie. with a CTE), the amount of time spent to execute the query is reduced since the CTE can be used throughout the query without having to be recalculated. This style also simplifies the query by separating the different aspects of the work (ie. narrowing our classes and getting their data).
+
+\subsection{Class and Data Structure Description}
+This program uses a single class: \code{CourseInfo}. This class contains creation methods for the \code{Connection} and \code{PreparedStatement} objects which are called by the main method run on program execution. This main method creates the above objects with the helper methods, then begins the program loop. This loop accepts user input, inserts that input into the \code{PreparedStatement}, executes it, and prints the result. This method is also responsible for cleaning up the connection object (ie. closing it) at program termination.
+
+\section{Execution}
+You may execute this program with
+\begin{verbatim}
+java -cp ".:*" CourseInfo
+\end{verbatim}
+provided you have a copy of the \code{db2jcc4.jar} and \code{db2jcc\_license\_cu.jar} files in the working directory.
+
+\section{Source}
+\verbatiminput{CourseInfo.java}
+
+\section{Test Output}
+\begin{verbatim}
+Enter a department name (or exit): CS
+Enter a start year: 1989
+Enter a last year: 1992
+C#    Name               Enrollment #Section Course Ave Max Class Ave Min Class Ave
+CS134 Principles of C...         46        1         82            82            82
+CS240 Data Structures...         44        1         72            72            72
+CS246 Software Abstra...         44        1         67            67            67
+CS342 Concurrent Prog...         71        1         61            61            61
+CS134 Principles of C...        170        2         70            75            62
+CS240 Data Structures...        148        3         62            66            61
+CS241 Foundation of S...        148        3         73            76            64
+CS246 Software Abstra...        148        2         67            70            60
+CS134 Principles of C...         79        4         64            68            55
+CS240 Data Structures...        134        2         59            65            53
+CS241 Foundation of S...        147        3         73            79            68
+CS246 Software Abstra...        134        2         68            72            63
+CS342 Concurrent Prog...        148        1         72            72            72
+CS134 Principles of C...         25        1         63            63            63
+CS240 Data Structures...         13        1         69            69            69
+CS246 Software Abstra...         13        1         42            42            42
+\end{verbatim}
+
+\begin{verbatim}
+Enter a department name (or exit): CS
+Enter a start year: 1990
+Enter a last year: 1993
+C#    Name               Enrollment #Section Course Ave Max Class Ave Min Class Ave
+CS134 Principles of C...        170        2         70            75            62
+CS240 Data Structures...        148        3         62            66            61
+CS241 Foundation of S...        148        3         73            76            64
+CS246 Software Abstra...        148        2         67            70            60
+CS134 Principles of C...         79        4         64            68            55
+CS240 Data Structures...        134        2         59            65            53
+CS241 Foundation of S...        147        3         73            79            68
+CS246 Software Abstra...        134        2         68            72            63
+CS342 Concurrent Prog...        148        1         72            72            72
+CS134 Principles of C...         25        1         63            63            63
+CS240 Data Structures...         13        1         69            69            69
+CS246 Software Abstra...         13        1         42            42            42
+CS240 Data Structures...         21        1         75            75            75
+CS241 Foundation of S...         21        1         72            72            72
+CS246 Software Abstra...         21        1         42            42            42
+\end{verbatim}
+
+\begin{verbatim}
+Enter a department name (or exit): CS
+Enter a start year: 1991
+Enter a last year: 1995
+C#    Name               Enrollment #Section Course Ave Max Class Ave Min Class Ave
+CS134 Principles of C...         79        4         64            68            55
+CS240 Data Structures...        134        2         59            65            53
+CS241 Foundation of S...        147        3         73            79            68
+CS246 Software Abstra...        134        2         68            72            63
+CS342 Concurrent Prog...        148        1         72            72            72
+CS134 Principles of C...         25        1         63            63            63
+CS240 Data Structures...         13        1         69            69            69
+CS246 Software Abstra...         13        1         42            42            42
+CS240 Data Structures...         21        1         75            75            75
+CS241 Foundation of S...         21        1         72            72            72
+CS246 Software Abstra...         21        1         42            42            42
+CS342 Concurrent Prog...         26        1         63            63            63
+CS348 Introduction to...         48        2         75            76            74
+CS354 Operating Syste...         26        1         76            76            76
+CS348 Introduction to...         79        2         76            77            74
+\end{verbatim}
+\end{document}
