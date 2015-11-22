@@ -5,24 +5,33 @@ Kevin
 * ECE 457A (Cooperative)
 
 4B (Winter)
-* CO 487 (Applied Cryptography)
 * CS 444 (Compiler Construction)
 * CS 458 (Computer Security and Privacy)
 * STV 205 (Cybernetics)
-* HUMANITY
+* FREE
+* FREE
+
+Maybe
+* CS 436 (Networks and Distributed Systems) or CS 456 (Computer Networks)
+* CS 450 (Computer Architecture)
+* CO 487 (Applied Cryptography)
 
 Lara
 ====
 4A (Spring)
-* CS 466 (Algorithm Design)
+* CS 466 (Algorithm Design and Analysis)
 * ECE 457A (Cooperative)
 
 4B (Winter)
-* CO 487 (Crypto)
 * CS 458 (Computer Security and Privacy)
-* ECE 416 (High-Level Networks)
 * STV 205 (Cybernetics)
-* EASIA 205R (Japanese History)
+* FREE
+* FREE
+* FREE
+
+Maybe
+* CS 456 (Computer Networks)
+* CO 487 (Applied Cryptography)
 
 Nik
 ===
@@ -69,6 +78,8 @@ Tyler
 
 Interesting ECEs
 ----------------
+<!-- CS{442,444,448,449,450,452,454,457,458,462,466,484,485,486,487,488} -->
+<!-- ECE{409,416,418,423,429,454,455,457A,457B,458,459,481,486,488} -->
 |Course                                              |Available      |
 |----------------------------------------------------|---------------|
 |CO 487 (Applied Cryptography)                       |4B             |
@@ -91,20 +102,6 @@ Interesting ECEs
 |ECE 457A (Cooperative and Adaptive Algorithms)      |4A             |
 |ECE 459 (Performance)                               |4B             |
 
-
-Potential Humanity Courses
---------------------------
-* ECON 101 (Micro)
-* ECON 102 (Macro)
-* SPCOM 223 (Speeches)
-* RS 121 (Evil)
-* RS 170 (Religion and Pop Culture)
-* RS 258 (God)
-* RS 370 (Athiesm, Skepticism, and Free-Thought)
-* SMF 206 (Introduction to Sexuality)
-* ANTHRO 101 (Introduction to Anthropology)
-* EASIA 201R (East Asian Culture)
-* MUSIC 246 (Soundtracks... override?)
 
 Template
 ========
