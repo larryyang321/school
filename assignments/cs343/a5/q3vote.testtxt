@@ -1,0 +1,208 @@
+Q2 TEST DOCUMENTATION
+=========================
+This program tallies votes across multiple tasks in varying group sizes.
+
+USER INTERRFACE TESTING
+    There is no user interface to be tested, so the testing focuses solely on
+    the algorithm used for the conversion.
+
+ALGORITHM TESTING
+
+  TEST 1:
+  -------
+    DATA DESCRIPTION
+    The EXT binary is called with parameters `6 3 6`.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.   Voter0  Voter1  Voter2  Voter3  Voter4  Voter5
+    2.   ======= ======= ======= ======= ======= =======
+    3.   S
+    4.   V p
+    5.   B 1     S
+    6.           V s
+    7.           B 2             S
+    8.                           V p
+    9.                           C
+    10.  ...     ...     ...     F p     ...     ...
+    11.          U 1                             S
+    12.  ...     F p     ...     ...     ...     ...
+    13.  U 0
+    14.  F p     ...     ...     ...     ...     ...
+    15.                                          V p
+    16.                                  S       B 1
+    17.                                  V s
+    18.                  S               B 2
+    19.                  V s
+    20.                  C
+    21.  ...     ...     F s     ...     ...     ...
+    22.                                  U 1
+    23.  ...     ...     ...     ...     F s     ...
+    24.                                          U 0
+    25.  ...     ...     ...     ...     ...     F s
+    26.  =================
+    27.  All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct.
+
+  TEST 2:
+  -------
+    DATA DESCRIPTION
+    The INT binary is called with parameters `6 3 6`.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.   Voter0  Voter1  Voter2  Voter3  Voter4  Voter5
+    2.   ======= ======= ======= ======= ======= =======
+    3.   S
+    4.   V p
+    5.   B 1     S
+    6.           V s
+    7.           B 2             S
+    8.                           V p
+    9.                           C
+    10.  ...     ...     ...     F p     ...     ...
+    11.  U 1                                     S
+    12.  F p     ...     ...     ...     ...     ...
+    13.          U 0
+    14.  ...     F p     ...     ...     ...     ...
+    15.                                          V p
+    16.                                  S       B 1
+    17.                                  V s
+    18.                  S               B 2
+    19.                  V s
+    20.                  C
+    21.  ...     ...     F s     ...     ...     ...
+    22.                                          U 1
+    23.  ...     ...     ...     ...     ...     F s
+    24.                                  U 0
+    25.  ...     ...     ...     ...     F s     ...
+    26.  =================
+    27.  All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct.
+
+  TEST 3:
+  -------
+    DATA DESCRIPTION
+    The INTB binary is called with parameters `6 3 6`.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.   Voter0  Voter1  Voter2  Voter3  Voter4  Voter5
+    2.   ======= ======= ======= ======= ======= =======
+    3.   S
+    4.   V p
+    5.   B 1     S
+    6.           V s
+    7.           B 2             S
+    8.                           V p
+    9.                           C
+    10.  ...     ...     ...     F p     ...     ...
+    11.                                          S
+    12.          U 1                             b
+    13.  ...     F p     ...     ...     ...     ...
+    14.  U 0                             S
+    15.  F p     ...     ...     ...     ...     ...
+    16.                                          V p
+    17.                                  V s     B 1
+    18.                  S               B 2
+    19.                  V p
+    20.                  C
+    21.  ...     ...     F p     ...     ...     ...
+    22.                                  U 1
+    23.  ...     ...     ...     ...     F p     ...
+    24.                                          U 0
+    25.  ...     ...     ...     ...     ...     F p
+    26.  =================
+    27.  All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct (note that the task fourth task Voter5
+    barges).
+
+  TEST 4:
+  -------
+    DATA DESCRIPTION
+    The AUTO binary is called with parameters `6 3 6`.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.   Voter0  Voter1  Voter2  Voter3  Voter4  Voter5
+    2.   ======= ======= ======= ======= ======= =======
+    3.   S
+    4.   V p
+    5.   B 1     S
+    6.           V s
+    7.           B 2             S               S
+    8.                           V p
+    9.                           C
+    10.  ...     ...     ...     F p     ...     ...
+    11.  U 1
+    12.  F p     ...     ...     ...     ...     ...
+    13.          U 0                     S
+    14.  ...     F p     ...     ...     ...     ...
+    15.                                          V p
+    16.                                  V s     B 1
+    17.                  S               B 2
+    18.                  V s
+    19.                  C
+    20.  ...     ...     F s     ...     ...     ...
+    21.                                          U 1
+    22.  ...     ...     ...     ...     ...     F s
+    23.                                  U 0
+    24.  ...     ...     ...     ...     F s     ...
+    25.  =================
+    26.  All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct.
+
+  TEST 5:
+  -------
+    DATA DESCRIPTION
+    The TASK binary is called with parameters `6 3 6`.
+
+    TESTING
+    Here is the log of the test output with line numbers attached.
+
+    1.   Voter0  Voter1  Voter2  Voter3  Voter4  Voter5
+    2.   ======= ======= ======= ======= ======= =======
+    3.   S
+    4.   V p
+    5.   B 1     S               S               S
+    6.           V s
+    7.           B 2             V p
+    8.                           B 3
+    9.   U 2                     C
+    10.  F p     ...     ...     ...     ...     ...
+    11.          U 1                     S
+    12.  ...     F p     ...     ...     ...     ...
+    13.                          U 0
+    14.  ...     ...     ...     F p     ...     ...
+    15.                  S                       V p
+    16.                                  V s     B 1
+    17.                  V s             B 2
+    18.                  B 3
+    19.                  C                       U 2
+    20.  ...     ...     ...     ...     ...     F s
+    21.                                  U 1
+    22.  ...     ...     ...     ...     F s     ...
+    23.                  U 0
+    24.  ...     ...     F s     ...     ...     ...
+    25.  =================
+    26.  All tours started
+
+    ANALYSIS
+    The results from running the program with these parameters show that
+    everything seems to be correct (note that every task blocks at some point).

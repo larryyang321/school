@@ -1,0 +1,4 @@
+If we consider that each angel has gone to sleep (eg. blocked itself) and is
+expecting to be awoken (signalled) by the lack of eyes upon them (ie. by some
+universal Weeping Angel monitor), we can see we have a deadlock between all of
+the angels.

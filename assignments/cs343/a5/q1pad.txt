@@ -1,0 +1,21 @@
+$ u++ -O2 -multi -nodebug q1pad.cc -o nopad
+$ /usr/bin/time -f "%Uu %Ss %E" ./nopad 2000000000
+0x62ec48 0x62ec40 0x62ec38 0x62ec30
+2000000000
+2000000000
+7.68u 0.00s 0:03.86
+
+$ u++ -O2 -multi -nodebug -DPAD q1pad.cc -o pad
+$ /usr/bin/time -f "%Uu %Ss %E" ./pad 2000000000
+0x62ed00 0x62ecc0 0x62ec80 0x62ec40
+2000000000
+2000000000
+7.67u 0.00s 0:03.86
+
+With PAD both set and not set, the memory locations of the counters are in two
+different cache lines.
+
+The addresses are in descending order, as it should be given that we are using
+the stack.
+
+Casting to ``void *'' allows us to print in hex format.
