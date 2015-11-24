@@ -15,6 +15,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
         ++countStatue;
     }
 
+    // Use _Monitor._Accept for external scheduling
     ++waiters;
     if (waiters < group) {
         printer.print(id, Voter::States::Block, waiters);
@@ -45,6 +46,8 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
         ++countStatue;
     }
 
+    // The combination of blocked.wait() and blocked.signal() emulates the
+    // external solution's _Accept statement
     ++waiters;
     if (waiters < group) {
         printer.print(id, Voter::States::Block, waiters);
@@ -86,6 +89,8 @@ void TallyVotes::signalAll() {
 }
 
 TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
+    // Emulate a gate by blocking until the current voter is the last in the
+    // group
     unsigned int ticket = tickets++;
     while (ticket >= serving) {
         printer.print(id, Voter::States::Barging);
@@ -99,6 +104,8 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
         ++countStatue;
     }
 
+    // We use the pre-implemented wait() and signalAll() functions to ensure
+    // all tasks leave this block
     ++waiters;
     if (waiters < group) {
         printer.print(id, Voter::States::Block, waiters);
@@ -114,6 +121,9 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
     }
     --waiters;
 
+    // At the completion of a group, ensure all tasks are signalled and the
+    // ticket server is properly incremented for the next batch of n (= group)
+    // waiters
     if (!waiters) {
         serving += group;
         signalAll();
@@ -136,10 +146,12 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
         ++countStatue;
     }
 
+    // reset this flag on the the first waiter per group
     if (!waiters) {
         doneVoting = false;
     }
 
+    // set flag only on final voter, otherwise wait until flag is set
     if (waiters < group - 1) {
         WAITUNTIL(doneVoting, printer.print(id, Voter::States::Block, ++waiters),
                   printer.print(id, Voter::States::Unblock, --waiters));
@@ -173,6 +185,7 @@ TallyVotes::Tour TallyVotes::vote(unsigned int id, Tour ballot) {
 void TallyVotes::main() {
     for (;;) {
         _Accept(~TallyVotes) {
+            // gracefully exit on _Task destruction
             return;
         } or _Accept(vote) {
             printer.print(id, Voter::States::Vote, ballot);
@@ -189,6 +202,8 @@ void TallyVotes::main() {
                 result = (countPicture > countStatue) ? 0 : 1;
                 countPicture = countStatue = 0;
 
+                // only for the final voter, unblock all others and print
+                // relevant info
                 while (!blocked.empty()) {
                     printer.print(blocked.front(), Voter::States::Unblock,
                                   --waiters);
