@@ -1,0 +1,297 @@
+\documentclass[12pt]{article}
+\usepackage{wkrpt}
+\begin{document}
+
+
+\title{An Analysis of the Development of Auto-Updating Manifest-Based Installers}
+{
+    AeroFS\\
+    635 High St, Palo Alto, California.
+}
+{
+    Kevin Carruthers\\
+    4A Software Engineering\\
+    20463098\\
+    kcarruth\\
+    May 9th, 2016
+}
+
+
+\letter{An Analysis of the Development of Auto-Updating Manifest-Based Installers}{4A}{AeroFS}{Technical Development}
+{
+    \noindent
+    Kevin Carruthers\\
+    271 Westcourt Pl, unit 111\\
+    Waterloo, Ontario. N2L 2R8
+}
+{
+    My position involved working on all aspects of AeroFS's stack, and especially the ``build'' aspects of those subsystems. I touched upon API and SDK development, data syncing, installer generation, metadata and content search, and build procedures.
+}
+{
+    This report will focus on the development of a new style of application installer. More specifically, this new style of application installer allows for on-the-fly server modifications to modify client manifests and generate new configurations allowing for more dynamic and easily modifiable client installs. As an afterword, I will discuss the relative merits of ``slim'' vs ``traditional'' installers.
+}
+{
+    I wish to thank P. Kang for the idea of creating the \LaTeX\ template with which I wrote this report.
+}
+{
+    \includegraphics[scale=0.4]{signature.jpg}\\
+    \line(1,0){150}\\
+    Kevin Carruthers, 20463098
+}
+
+
+\tocsection{Executive Summary}
+AeroFS has one main product, which has a client-server architecture which must be deployed upon end-user's machines~\cite{aerofs} (end-users are companies, wherein the server is deployed by the company and each client is installed on each employee's computer). It is important that this product function across a wide variety of operating systems and environments, running native code where applicable since speed is a major concern.
+
+Many companies offer similar products; it is a well understood practice to package all code relevant for a system (eg. all shared code, native code for this platform, platform-specific configuration, etc) into a single ``installer file'' for each system, then distribute that. The installer would contain all necessary data for a working installation, often compressed, which would be moved to the correct locations upon installation.
+
+Today, I present an alternative method of generating these installers: rather than packaging the relevant data into the installer, all code and configuration should be stored on the server to-be-downloaded upon launching the client. This report will argue that this is the better option in the case of a client-server architecture similar to what is described above.
+\newpage
+
+
+\toc
+% \lof
+\lot
+
+
+\pagenumbering{arabic}
+\section{Introduction}
+AeroFS has a client-server architecture wherein each deployment contains one or more (but generally not more than ``a few'') servers and many clients (approximately equal to number of employees). This report will not deal with the installation or update procedures of the server, but with the installation procedure for each client and the process by which they should update upon a server update.
+
+In the past, this process involved the user downloading an installer containing the entire client architecture and installing that; the update procedure, similarly, downloaded the entire new installer file, overwrote the old install, and restarted the client into the new version. Recently, though, AeroFS has been working on a new product; this new product will integrate with the old client-server architecture in such a way that updates will become more frequent, especially during initial development. For this reason, new consideration was given to the installers in an effort to improve this workflow.
+
+The previous solution is inherently flawed for several reasons: a large amount of network IO is required even if many files have not changed between versions, the update process is slow since it requires an entire download and reinstall, making any changes to the server with respect to client usage requires a new version be released -- a lengthy and overly formal process in the case of, say, the company modifying the computer upon which the AeroFS server is running.
+
+\subsection{Problem Requirements}
+Any new installation and update procuedure must support all aspects of the current process as well as solving the above issues. The requirements, then, are as follows:
+\begin{itemize}
+\item ensure end-users can install a working client in a few clicks (eg. ``download'' and ``install''), and
+\item ensure each platform includes platform-specific overrides for eg. native code, platform-specific configs, etc, and
+\item ensure this process is fast: network usage should be as minimal as possible, and
+\item ensure this process interrupts the user's workflow as little as possible: requiring the user to pause work, click ``update'', and wait for a while, should be avoided if possible, and
+\item ensure small modifications especially can be done with no interruption to user workflows
+\end{itemize}
+
+\subsection{Problem Statement}
+This report will discuss possible solutions to these issues, the pros and cons of those solutions, and the determination of the correct set of solutions. It will argue that this correct set of solutions corresponds exactly the the manifest-based installation described above. It will then argue that these solutions should be applied to other systems in a singular configuration, rather than being an AeroFS-specific solution.
+
+\subsection{Report Structure}
+This report will discuss each aspect of an installer in depth, discussing the standard approach as well as a couple modifications which may improve that aspect. These alternative implementations will be subjected to MCDM (Multi-Criteria Decision-Making)~\cite{mcda} criterion evaluation and those implementations that come up as best under this system will be carried forward to further aspects of the system.
+
+The completed system in all its aspects will then be described once each individual aspect has been determined.
+
+This report is intended to be read by those interested in the development of multi-platform installers both at AeroFS and elsewhere. A background in general software engineering practices and some experience with multi-platform build processes or compatibility is beneficial, but not required.
+\newpage
+
+
+\section{System Development}
+This report will develop an installation setup which fulfils in some respect the following tasks:
+\begin{enumerate}
+\item platform-specific code localization upon installation
+\item ability to auto-update to latest versions
+\end{enumerate}
+
+These tasks must be performed with the following constraints:
+\begin{itemize}
+\item minimal user interaction, especially with respect to wait times
+\item updating should not interrupt user workflows
+\end{itemize}
+
+These systems must be applicable to the environment defined by AeroFS's development practices and procedures, described below:
+\begin{itemize}
+\item AeroFS maintains a single repository containing many small ``micro-service''~\cite{microservices}-like projects.
+\item Some combination of these projects are built together to form some of the core AeroFS products: the server, the server-updater, the clients for each platform, and some supplementary tools.
+\item Some of these projects are ``overrides'' -- projects which exactly implement the requirements of some other project, but in a fashion more specific to a given platform. These projects should override the more general version whenever they are applicable.
+\end{itemize}
+
+\subsection{Platform Localization}
+This report will describe first the standard approach to this problem: build files are kept which describe the subsystems and configuration required for each project for each platform. These files are used upon building platform-specific installers to package the given subsystems into the single installer, which is then distributed to users. This method shall be referred to as the ``override'' method, since each of these platform-specific aspects often overrides a more general aspect of the system.
+
+Another possibility is a non-localized approach wherein any platform specific code is built as switches within the general codebase -- eg. instead of having a general service to do X and a Windows-specific service to do X, we simply have the single general service to do X with switches within it to detect platform and perform platform-specific behaviour if applicable. We refer to this as the ``internal switch'' method.
+
+We can also describe an approach where these platform-specific files are not packaged into the installer, but are stored elsewhere and downloaded when necessary, eg. by the first launch of the application detecting its platform and pulling the relevant files. Within this approach, we have two options: either package all of the general solutions and only pull overrides at runtime, or package nothing and pull both overrides (if applicable) and general projects at runtime. We refer to these approaches respectively as ``semi-manifested'' and ``fully-manifested''.
+
+This report defines the criteria for determining which of these systems should be implemented as follows:
+\begin{description}
+\item[Responsiveness] should be maximized, where we describe the responsiveness as the inverse of the time a user must wait without interaction. This should be the most important criteria.
+\item[Installation/Update Speed] should be maximized. Though this is somewhat included in responsiveness, it is important we count it seperately to ensure our decision matrix contains more detail: we consider this important as well, only slightly behind responsiveness.
+\item[Network IO] should be minimized. Though this is somewhat included in responsiveness, it is important we count it seperately to ensure our decision matrix contains more detail: we consider this important as well, only slightly behind responsiveness.
+\item[Implementation Time] should be minimized, but since this cost is only paid once this report will consider it minimally important.
+\item[Maintenance Cost] of the in-place system should be minimized, though again not at the expense of quality of the above criteria.
+\end{description}
+
+Also important is to ensure each system has the capability of providing the correct code and configuration, ie. properly uses the ``override'' projects. Since this is a binary classifier for which the above approaches all satisfy, we leave this out of our criteria.
+
+For mathematical ease, each of these criteria will be represented on a scale from one to five such that a five is the best possible score and a one is the worst. This report thus determines the weighting of these systems as follows and while keeping in mind the above descriptions of the criteria. Note that larger weightings should be applied to more important criteria:
+\begin{itemize}
+\item ``Implementation Time'' is not overly important as we are more concerned with developing a better solution that with creating that solution faster. We assign this a weighting of {\it 1}.
+\item ``Maintenance Cost'' deals with recurring costs which should be minimized but should not be the limiting factor in the decision. As such, this will be declared to be twice as important as the previously described criteria and assigned a weighting of {\it 2}.
+\item ``Network IO'' and ``Installation/Update Speed'' are both very important to our end-product; reducing any annoyances caused by the user's first interaction with our product should be a priority; we thus assign this a weighting of {\it 4}.
+\item ``Responsiveness'' is clearly the most important of these categories: as explained above, reducing user annoyances is a major priority. Since responsive design is the act of design systems that appear perfectly responsive to user requests, this item should clearly be assigned the maximal weighting of {\it 5}.
+\end{itemize}
+
+\begin{table}[ht]
+\caption{Criteria Weighting for Platform Localization}
+\label{tbl:weighting-pltfrmlclztn}
+\centering
+\begin{tabular}{|l|r|r|}
+    \hline
+    Criterion & Relative Weighting & Percentage Weighting \\
+    \hline
+    \hline
+    Implementation Time       &  1 &   6.25\% \\
+    Maintenance Cost          &  2 &  12.50\% \\
+    Installation/Update Speed &  4 &  25.00\% \\
+    Network IO                &  4 &  25.00\% \\
+    Responsiveness            &  5 &  31.25\% \\
+    \hline
+    \hline
+    Total                     & 16 & 100.00\% \\
+    \hline
+\end{tabular}
+\end{table}
+
+It is then possible to apply the criteria in table~\ref{tbl:mcdm-pltfrmlclztn} to determine which approach is best. The scores for each approach were calculated as follows:
+\begin{description}
+\item[Responsiveness] is applied to the override, internal switch, semi-manifested, and fully-manifested systems by determining the subjective result of implementing the given system. The override approach results in some slowness suring installation but otherwise the user is kept fully aware of what is ongoing -- eg. by a progress bar~\cite{progressbar} during the installation and during the download of the installer. We assign this a {\it 4}. The internal switch acts similarly from the user's perspective: since it should act the same, we also assign it a {\it 4}. The semi-manifested approach results in a smaller initial download, at the expense of taking a moment to download the manifests on firt run. Since some progress indicator will be included, this in fact benefits responsiveness be spreading the loading into smaller chunks. We assign this a {\it 5}. The fully manifested solution moves all the waiting to the same step (the manifest download). This is slightly worse than the previous approach, so we assign this a {\it 4}.
+\item[Installation/Update Speed] is determined as follows: for the override, this is very slow in both cases and is thus assigned a {\it 2}. The internal switch case is the same, ie. a {\it 2}. The semi-manifested approach is much faster to install and can be updated without redownloading any untouched platform-specific code. We thus assign this a {\it 4}. THe fully-manifested approach is best here, as an update only needs to download modified files -- we assign this a {\it 5}.
+\item[Network IO] for the override approach is very high since everything must be re-downloaded at each install or update. We assign this a {\it 1}. For the internal switch approach, this is slightly better, as the total binary size should be minimized very slightly by the lack of duplicated services. We assign this a {\it 2}. The semi-manifested solution cuts our download size a bunch by preventing re-downloading unchanged platform-specific files; we thus assign this a {\it 4}. Again, the fully manifested approach is best here, as never needing to re-download unchanged files cuts out network IO to the lowest possible -- we give this a {\it 5}.
+\item[Implementation Time] for the override approach is somewhat low; creating a new service for overrides provides some additional development overhead, but not much. We assign this a {\it 4}. The internal switch approach comes up best, here, adding what are effectively \ttfamily{if}\rmfamily{} statements here and there causes no additional development effort for implementation and is thus assigned a value of {\it 5}. The semi-manifested approach requires additional work; the manifest service would need to be developed. Similarly, the fully-manifested approach requires this service. In both cases, this service must be designed, implemented, tested, etc. We thus assign both of these approaches a value of {\it 2}.
+\item[Maintenance Cost] is highest for the first two approaches; in the case of the override method, each change to a general service must be mirrored to platform-specific code. This will cost a lot in maintenance, and is thus assigned a value of {\it 3}. Similarly, the internal switch approach leads to a large amount of nested variations within every project. This will eventually become extremely difficult to read and maintain as more platforms are added, more variations are required, etc. We assign this a {\it 1}. The semi-manifested approach requires the maintenance of the platform-specific code in the same way as does the override approach, but also requires maintenance of the manifest service. Since the code can be well-organized, this is slightly better than the internal switch approach and should be assigned a value of {\it 2}. The fully-manifested approach is identical and should also be assigned a {\it 2}.
+\end{description}
+
+\begin{table}[ht]
+\caption{MCDM Results for Platform Localization}
+\label{tbl:mcdm-pltfrmlclztn}
+\centering
+\begin{tabular}{|p{4.5cm}|p{0.65cm}|p{0.55cm}|p{0.55cm}|p{1.15cm}|p{1.15cm}|p{0.75cm}|p{0.75cm}|p{0.75cm}|p{0.75cm}|}
+    \hline
+    {\bf Criterion} & {\bf Wt.} & \multicolumn{2}{|p{1.1cm}|}{{\bf Override}} & \multicolumn{2}{|p{2.3cm}|}{{\bf \mbox{Internal Switch}}} & \multicolumn{2}{|p{1.5cm}|}{{\bf Semi-Manifested}} & \multicolumn{2}{|p{1.5cm}|}{{\bf Fully-Manifested}} \\
+    \hline
+    \hline
+    Implementation Time       &  1 & 4 &  4 & 5 &  5 & 2 &  2 & 2 &  2 \\
+    Installation/Update Speed &  4 & 2 &  8 & 2 &  8 & 4 & 16 & 5 & 20 \\
+    Maintenance Cost          &  2 & 3 &  6 & 1 &  2 & 2 &  4 & 2 &  4 \\
+    Network IO                &  4 & 1 &  4 & 2 &  8 & 4 & 16 & 5 & 20 \\
+    Responsiveness            &  5 & 4 & 20 & 4 & 20 & 5 & 25 & 4 & 20 \\
+    \hline
+    \hline
+    {\bf Total}               &    & \multicolumn{2}{|r|}{{\bf 42}} & \multicolumn{2}{|r|}{{\bf 43}} & \multicolumn{2}{|r|}{{\bf 63}} & \multicolumn{2}{|r|}{{\bf 66}} \\
+    \hline
+\end{tabular}
+\end{table}
+
+As indicated by having the largest ``score'', the fully-manifested approach is best. Thus, the installers should be generated in such a way as to contain manifests for each system of required files and download these as-needed on first run.
+
+\subsection{Auto-Updating Capability}
+In order to facilitate a rapid development cycles, the ability to ensure clients are always on the latest version is important. The report defines two possible methods of accomplishing this:
+
+The user-centric manual approach wherein the user is provided with an update button which performs the update-to-latest-version procedure and restarts their client in this version. This approach has the benefit of ensuring the user is aware of any changes to their system; additionally, it can be supplemented with other aspects such as reminder popups or forced-after-x-amount-of-time updates to ensure the user updates in a timely manner.
+
+Alternatively, it is possible to automate this procedure in the background. This would require updates which are small and fast enough to occur at any time without interrupting the user's workflow. Though the user does not get insight into when updates occur with this system, the goal is to create an environment in which the user does not need to be made aware of the changes. Since we have determined that a fully-manifest based installer solution is best, this becomes a real option; with the client needing only to download modified files, updates can occur very quickly.
+
+For either of these options, some form of updater which cleanly replaces the user's version of the application with a new, updated version must be made available. For the purposes of this report, we will consider only the case where only uninstallers/installers exist rather than custom updaters from and to each possible version combination. This simplifies our analysis, since we will use the installer service destribed above (determined in this report to be a fully-manifested system).
+
+This report defines the criteria for determining which of these systems should be implemented as follows:
+\begin{description}
+\item[Seamlessness] covers all aspects of the update process being ``not too much of a hastle'' for the user. This is very important.
+\item[Correctness] is how much we can guarantee that, at any point in time, each user is running the same (latest) version. This is very important, only falling slightly behind ``seamlessness''.
+\item[Deployment Speed] takes into account how quickly either AeroFS or a company using its product can make a change and deploy it to all clients. For this aspect, we ignore any aspects which should be included in the ``correctness'' bullet above. This is somewhat important, but not quite as much as ``seamlessness'' or ``correctness''.
+\item[Implementation Time] should be minimized, but since this cost is only paid once it can be considered minimally important.
+\item[Maintenance Cost] of the in-place system should be minimized, though again not at the expense of solution quality.
+\end{description}
+
+For mathematical ease, each of these criteria will be represented on a scale from one to five such that a five is the best possible score and a one is the worst. The determination of the weighting of these systems is as follows, keeping in mind the above descriptions of the criteria. Note that larger weightings should be applied to more important criteria:
+\begin{itemize}
+\item ``Implementation Time'' is the least important feature and so is assigned a weighting of {\it 1}.
+\item ``Maintenance Cost'' deals with expended effort which should be minimized but should not be the limiting factor in the decision, nor should system quality be sacrificed to reduce the amount of effort by any small margin. This report assigns these aspects a value of {\it 2}.
+\item ``Deployment Time'' is slightly more important as new features or fixes should be delivered to users as quickly as possible; additionally, company-wide server changes should be reflected in client installs as soon as possible. This aspect is thusly assigned a value of {\it 3}.
+\item ``Correctness'' is very important, as ensuring all users are running the latest code removes an entire (large) class of potential problems with interoperability which, in turn, improves the overall quality of our system. We thus assign this a value of {\it 4}.
+\item ``Seamlessness'' is the most important quality of this system; if we interrupt our users workflows whenever any change of our system occurs, we will quickly annoy and lose these users. We assign this a {\it 5}.
+\end{itemize}
+
+\begin{table}[ht]
+\caption{Criteria Weighting for Auto-Updating}
+\label{tbl:weighting-autoup}
+\centering
+\begin{tabular}{|l|r|r|}
+    \hline
+    Criterion & Relative Weighting & Percentage Weighting \\
+    \hline
+    \hline
+    Implementation Time &  1 &   6.66\% \\
+    Maintenance Cost    &  2 &  13.33\% \\
+    Deployment Time     &  3 &  20.00\% \\
+    Correctness         &  4 &  26.66\% \\
+    Seamlessness        &  5 &  33.33\% \\
+    \hline
+    \hline
+    Total               & 15 & 100.00\% \\
+    \hline
+\end{tabular}
+\end{table}
+
+It is possible to apply these criteria in table~\ref{tbl:mcdm-autoup} to determine which approach is best. The scores for each approach were calculated as follows:
+\begin{description}
+\item[Seamlessness] is applied to the two potential systems by determining the subjective quality of life of a user during an update. In the case of the user-centric model, the user must stop their workflow to update the app specifically; though the only effort they must expend is clicking an ``update'' button, this interruption is clearly not ideal. We assign this case a value of {\it 2}. The background-updater, on the other hand, does not require this interaction. In fact, the only user-facing issue is that service may be momentarily interrupted in the moment between restarting the old version and starting the new version of the application. We thus assign this option a {\it 4}.
+\item[Correctness] is determined as follows: the user-centric option requires users manually begin the update; if they do not do so, only a manual timeout forces the update. This case, then, is assigned a value of {\it 2}. In the background-update case, the new update is applied at whatever poll interval is set in the client: almost certainly much lower than the timeout set in the other option. We thus assign this option a {\it 4}.
+\item[Deployment Time] for the former option requires updating the server, letting the server update its version tag, then having clients update. In the latter case, the same steps are required. This aspect of system quality, then, contains no new information not contained within the ``correctness'' criteria above. We assign both a value of {\it 3}.
+\item[Maintenance Cost] is best described as a difference: assuming we give the user-centric model a value of {\it 3}, we can describe the differences for the bakground-update model thusly: the background-update service must be maintained, but the user-reminders and entire user-interface for updating can be removed. We consider these roughly equivalent, and so assign the background-updater approach a value of {\it 3}.
+\item[Implementation Time] for the user-centric approach is somewhat straightforward: a check to see if the version matches the server version and an update button which pulls the new installer, runs it, and restarts itself. We assign this a value of {\it 3}. The background-updater, on the other hand, requires we additionally implement an automated service for doing the download, update, and restart without impacting the user. This will require some, but not much, development work, and we thus assign this approach a bvalue of {\it 2}.
+\end{description}
+
+\begin{table}[ht]
+\caption{MCDM Results for Auto-Updating}
+\label{tbl:mcdm-autoup}
+\centering
+\begin{tabular}{|p{5.0cm}|p{0.65cm}|p{0.5cm}|p{0.5cm}|p{1.7cm}|p{1.7cm}|}
+    \hline
+    {\bf Criterion} & {\bf Wt.} & \multicolumn{2}{|p{1cm}|}{{\bf User-Centric}} & \multicolumn{2}{|p{3.4cm}|}{{\bf \mbox{Background-Updater}}} \\
+    \hline
+    \hline
+    Correctness         &  4 & 2 &  8 & 4 & 16 \\
+    Deployment Time     &  3 & 3 &  9 & 3 &  9 \\
+    Implementation Time &  1 & 3 &  3 & 2 &  2 \\
+    Maintenance Cost    &  2 & 3 &  6 & 3 &  6 \\
+    Seamlessness        &  5 & 2 & 10 & 4 & 20 \\
+    \hline
+    \hline
+    {\bf Total}         &    & \multicolumn{2}{|r|}{{\bf 13}} & \multicolumn{2}{|r|}{{\bf 53}} \\
+    \hline
+\end{tabular}
+\end{table}
+
+As indicated by having the larger ``score'', the background-updater approach is best. We thus ensure our manifest-based installer can automatically update, pulling the new manifests occasionally and updating the required files whenever they do not match the manifest.
+\newpage
+
+
+\section{Conclusion}
+The results of these evaluations conclude that a fully-manifest driven automated-updating approach to generating client installers/updaters is the best option. We can see that it clearly implements our stated requirements: users can install the application with a minimum of effort, each platform receives its platform-specific overrides, network usage is as minimal as possible, the user's workflow is not interrupted, and small modifications to the server are quickly mirrored in each client.
+
+As such, this solution should be (and was) implemented at AeroFS.
+
+Ultimately, the quality of the systems was the largest factor in determining the correct soluiton; this is a good approach since it is important to place quality over developer time in non-extreme cases.
+\newpage
+
+
+\section{Generalization}
+This report recommends that AeroFS implements the above defined installer system to enhance its client experience. Furthermore, it is easy to see that the above approach easily generalizes to any company with a similar set of requirements (see the requirements outlined in the ``System Development'' section).
+
+This report would argue that these practices can and should be applied to a wider range of companies, that is, any with a client-server architecture amenable to these system changes. This argument can be made due to the overwhelmingly ``better'' effects such a system causes for any company which implements it:
+\begin{itemize}
+\item Smaller installer binaries
+\item Faster install/update times
+\item Less user waiting
+\item Quicker release cycles
+\item No version mismatch errors
+\end{itemize}
+
+Clearly, the introduction of these qualities to any company's software development workflow would be beneficial. As such, they should implement the above defined system, modified slightly for their slightly differing needs.
+\newpage
+
+
+\addcontentsline{toc}{section}{\refname}
+\bibliography{wkrpt}
+\newpage
+
+\end{document}
