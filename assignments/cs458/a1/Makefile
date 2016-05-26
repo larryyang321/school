@@ -1,17 +1,18 @@
-OBJECTS := sploit1 sploit2 sploit3
+include ../../../latex.Makefile
 
-all: $(OBJECTS);
+
+OBJECTS := sploit1 sploit2 sploit3 sploit4
+
+all: $(OBJECTS) a1.pdf;
 
 sploit1: sploit1.c shellcode.h
 sploit2: sploit2.c shellcode.h
 sploit3: sploit3.c shellcode.h
+sploit4: sploit4.c shellcode.h
 
 %:
 	gcc -Wall -ggdb $< -o $@
 
 clean:
-	rm -rf $(OBJECTS)
-
-
-send:
-	rsync -rtlv `pwd`/ uwaterloo-ugster:/home/kcarruth/uml/share
+	rm -f $(OBJECTS)
+	rm -f a1.pdf

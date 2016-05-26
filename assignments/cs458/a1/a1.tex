@@ -1,0 +1,101 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{CS 458 --- Assignment 1}
+\author{Kevin Carruthers (20463098)}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+\subsection*{Part A}
+The doctor is compromising your {\bf privacy} as well as the agreed upon {\bf confidentiality} of your medical records.
+
+\subsection*{Part B}
+By preventing you from accessing the correct website, this compromises the {\bf availability}.
+
+\subsection*{Part C}
+The hacker here is infringing upon user's {\bf privacy}.
+
+\subsection*{Part D}
+This violates the {\bf privacy} of the parent as well as potentially violating the {\bf confidentiality} of the parent's work.
+
+\subsection*{Part E}
+This violates the {\bf confidentiality} of your password store as well as potentially exposing other privacy, etc concerns.
+
+\subsection*{Part F}
+This compromises the {\bf availability} of anyone using that cable as well as the overall {\bf integrity} of the internet.
+
+\section*{Question 2}
+\begin{description}
+\item[interception] is possible in this configuration by mixing up cables and pegs; in this way, it could be possible to send data that is meant for a given system to another system. One possible way to deal with this attack is through {\bf detection}. Pings could be sent to each system at some interval; if ever that ping is not received by the specified system, it is possible that ping was intercepted.
+\item[interruption] can be accomplished here by removing a peg. In this case, the data that should be sent to the given system labelled by that peg is not sent there (since there is no peg to designate where it should be sent). We can {\bf recover} from this by keeping backup pins and re-adding them to the wire when and if they are removed.
+\item[modification] could occur by connecting a device somewhere within the route between the central system and the pegged system. In this way, all packets that should be sent to the pegged system are routed through the attack system -- these can be modified at will and passed along. One possible method of avoiding this is through {\bf deterrence}: if each computer is connected to the main hub by three hundred and fourty-six thousand nine-hundred and eighteen wires, $n-1$ of which are simply decoys, the attacker would need to put in a significant amount of effort to do this form of attack, thus deterring them from accomplishing it.
+\item[fabrication] may be a problem if we create new pegs and bring them to the convention. By doing this, we can create duplicate addresses and thus inject new computers into the system. If we do so before the peg with that original address has been taken, we can fabricate new devices. We can {\bf prevent} this, by giving each address some secret key that is required before they can be signed up. If the front desk keeps these keys, then only pegs distributed by the fornt desk can be used.
+\end{description}
+
+\section*{Question 3}
+\subsection*{Part A}
+A digital lock is a small application attached to some other media (such as a document or video) which prevents unauthorized sharing and redistribution. This is often used in the case of copyrighted material which is not meant to be shared amongst more than some number of licenses.
+
+\subsection*{Part B}
+The recent request is not about decrypting a given device or set of data, but in creating a system wherein any Apple device may be decrypted by a keyholder. This is different since it involves modifying their own system to be less secure (at least in a specific case). Apple balked at this for several reasons: making this change will inherently make their system less secure (since introducing a backdoor will always allow some external attacker to potentially take advantage of it) as well as giving the FBI the tools they need to decrypt devices even without going through the proper channels.
+
+\subsection*{Part C}
+What the author is saying is that this change would necessitate all Apple devices being accessible by anyone. Though this is in fact not true, it is likely the author meant to speak to the generalized backdoor; that the decryption key, should it be leaked, would result in anyone with that key being able to decrypt Apple devices. More generally, by including a backdoor Apple opens up its products to attack from outsiders -- even though they may not have the key themselves, knowing that an exploit is possible would be enough to motivate them to attempt to do so.
+
+\subsection*{Part D}
+Not quite; the author here is using ``private'' to imply ``not shared with others''; this is much closer to the definition of confidential, given the Apple device does in fact store and use your ``private'' data to, eg. authenticate you with various third-party services. This is not quite how we define privacy, since privacy is more the act of keeping information about you and your actions out of the hands of any company, application, device, etc.
+
+\section*{Sploits}
+\subsection*{Sploit 1}
+This exploit uses a buffer overflow vulnerability. Specifically, it overflows a buffer in the \code{print\_usage} method, wherein 640 bytes from \code{argv[0]} is copied into a char array of size 210; any additional bytes above 210 will overflow up the stack.
+
+The exploit itself is fairly simple: set \code{argv[0]} to garbage of some length such that it fills the array of size 210 as well as the next four bytes (the sfp). Then, we simply write four more bytes to this array: the little-endian encoded address of our shellcode. In this case, the shellcode was simply passed in as \code{argv[2]}. Finally, we pass in \code{-h} as \code{argv[1]} to ensure this method is called.
+
+This vulnerability could be patched by ensuring the amount of data passed into this char array is no greater than its size.
+
+\subsection*{Sploit 2}
+This exploit takes advantage of a buffer overflow hidden within the \code{check\_for\_viruses} and \code{copy\_file} methods. The former can be exploited to fail its virus check simply by splitting the shellcode across some modulo-1024-byte boundary, and the latter contains a buffer overflow vulnerability which can only be triggered from a file.
+
+The exploit simply creates a file containing $2048 - \text{ strlen}(shellcode) + 4$ bytes of garbage, then the shellcode, and then the address of the shellcode. In this way, the shellcode itself is split across a 1024-byte boundary such that the virus check (which simply checks whether \code{bin/sh} is in any 1024-byte chunk of the file) incorrectly returns successfully. Once we pass the virus check, the exploit is simple: the entire file is loaded into a 2048 byte buffer when \code{copy\_file} is called, thus overriding the function's return pointer with the address of our shellcode.
+
+There are two vulnerabilities which should be patched in this case: the \code{copy\_file} method must be modified to prevent buffer overflows and the \code{check\_for\_viruses} function must be modified to prevent incorrect scans. The former can be accomplished simply by reading only a maximum of \code{sizeof(buf)} bytes into the buffer at any time and copying the file in chunks. The latter may be patched by reading the entire file into memory before doing the virus scan, rather than doing it a small chunk at a time.
+
+\subsection*{Sploit 3}
+This exploit abuses the fact that the \code{show\_confirmation} method runs the command \code{ls} but does not specify a path. Since PATH lookups of arbitrary executables search the current directory first, a file named \code{ls} would be found before \code{/bin/ls}.
+
+There is very little to this exploit: we simply create a file named \code{ls} in the current directory containing \code{/bin/sh} and mark it as executable. Upon \code{show\_confirmation} being called, this script is run as root: thus opening a root shell.
+
+To patch this vulnarability, we should make a call to \code{/bin/ls} directly to ensure we get the system \code{ls} binary. Technically, this is still vulnerable: if an attacker replaces the \code{ls} binary, they can still perform arbitrary commands as root. In practice, though, the \code{ls} binary is owned by root and the attacker would thus need to already have root access to run that exploit. We can thus consider this as an impossible attack vector.
+
+\subsection*{Sploit 4}
+My bonus exploit works as the above: creating an \code{ls} file which will be run as root. The interesting aspect of this exploit, though, is the end result.
+
+This exploit generates \code{ssh} keys for the current user. Then, as root, it copies the user's public key to the root user's \code{authorized\_hosts} file. Finally, it creates a root terminal by running \code{ssh root@localhost} as the current user. Interestingly, this allows the user to have root access in the future even without this exploit: since the ssh daemon for the root user will allow anyone with the user's private key to connect without a password, an attacker simply needs to move the \code{id\_rsa*} files to any other machine to have remote access to the root account.
+
+\subsection*{Other Exploits to Attempt}
+This section is not for marks, but details for other exploits I plan to attempt:
+
+\subsubsection*{System Modification}
+\begin{itemize}
+\item Modify \code{/etc/adduser.conf} to change USERS\_GID to root group and set USERGROUPS to ``no'', then create user; this new user should be placed in the root group.
+\item Overwrite the root user line of \code{/etc/passwd} with a known MD5 hash for the root user, then log in as root with that password.
+\item Modify the \code{su} command to not require a password.
+\end{itemize}
+
+\subsubsection*{submit Exploits}
+\begin{itemize}
+\item String format exploit in \code{print\_version}. The first 120 - 32 bytes of \code{argv[0]} should be \code{printf}'ed twice. The latter of the printf's is the string vulnerability exploit, the former simply means we must double encode any string format operators (eg. \code{argv[0] = ``\$\$n''}).
+\item Bash exploit in \code{run\_cmd}. This method takes an arbitrary list of parameters and runs \code{cmd} with the first seven. We may be able to run, eg. \code{ls -la /folder ; /bin/sh} to get a root shell.
+\item Attack vector in \code{get\_submit\_dir}. The \code{subdir\_name} is set from the SUBMIT\_DIRECTORY constant and a call to \code{getpwuid(getuid())->pw\_name}. By modifying our username, we may be able to set this to something weird. This could lead to a buffer overflow (change the user entry between the \code{malloc} and \code{strcat} calls), the arbitrary bash execution described above, or further exploits in \code{get\_dst\_name}.
+\item Attack vector in \code{get\_dst\_name}. Similar to above, the string this returns can be modified. This could allow us to copy our file to a different location, thus allowing some of the above exploits: for example, if we submit a file named \code{passwd} and overwrite this directory to the \code{/etc} directory, we can override the \code{/etc/passwd} file.
+\item Attack vector in \code{get\_logfile\_name}. This method performs a bunch of lookups based on user ID, creates a path based on the username, creates a file named LOG\_FILE, etc. This opens a bunch of attack vectors: in addition to those desribed above re: username exploits, there exists a suspicious race condition where the log file is created as the root user and the \code{chown}'ed to the user. It may be possible to exploit this such that we have a logfile owned by root that we can run to give us root access (note the contents of the logfile are simply \code{argv[2]} -- see \code{log\_message}).
+\item String format exploit in \code{check\_forbidden}. This method simply runs \code{printf} on \code{argv[1]}. This should be exploitable as a standard string format exploit.
+\end{itemize}
+
+\end{document}
