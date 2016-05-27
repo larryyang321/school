@@ -1,0 +1,128 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,enumerate,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{ECE 457A --- Assignment 1}
+\author{Kevin Carruthers (20463098)}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+This state space is represented by a tuple of the form $(x, y)$ where $x$ is the current amount of water in the 4 gallon jug and $y$ is the amount of water in the 3 gallon jug. The initial state is represented by $(0, 0)$. The goal state is represented by $\{(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)\}$.
+
+The set of actions that can be performed are as follows:
+\begin{itemize}
+\item Fill the 4 gallon jug (set $x = 4$).
+\item Fill the 3 gallon jug (set $y = 3$).
+\item Pour the 4 gallon jug into the 3 gallon jug (set $x = x - z$ and $y = y + z$ where $z = \min(3 - x, y)$).
+\item Pour the 3 gallon jug into the 4 gallon jug (set $x = x + z$ and $y = y - z$ where $z = \min(x, 4 - y)$).
+\item Empty the 4 gallon jug (set $x = 0$).
+\item Empty the 3 gallon jug (set $y = 0$).
+\end{itemize}
+
+\section*{Question 2}
+This state space is represented by a tuple of the form $(x, y, z)$ where each of $x$, $y$, and $z$ are lists containing some subset of the integer values from 1 to 64 in order of their placement on the pole. We arbitrarily define $x$ as the starting pole and $z$ as the goal pole. The starting and goal states, then, are respectively $([64, 63, \dots, 1], \emptyset, \emptyset)$ and $(\emptyset, \emptyset, [64, 63, \dots, 1])$.
+
+The set of actions that can be performed are as follows:
+\begin{itemize}
+\item Move a disk from the top of one pole to the top of another. Necessary conditions: the destination pole must be empty or contain no disk of smaller diameter than the disk to-be-moved.
+\end{itemize}
+
+\section*{Question 3}
+\subsection*{Breadth-First}
+\begin{enumerate}
+\item Open: $[A]$, Closed: $\emptyset$. INITIAL STATE.
+\item Open: $[B, D, E]$, Closed: $[A]$.
+\item Open: $[D, E, G]$, Closed: $[A, B]$.
+\item Open: $[E, G, C, F]$, Closed: $[A, B, D]$.
+\item Open: $[G, C, F, H, I]$, Closed: $[A, B, D, E]$.
+\item Open: $[C, F, H, I]$, Closed: $[A, B, D, E, G]$.
+\item Open: $[F, H, I]$, Closed: $[A, B, D, E, G, C]$.
+\item Open: $[H, I]$, Closed: $[A, B, D, E, G, C, F]$.
+\item Open: $[I]$, Closed: $[A, B, D, E, G, C, F, H]$.
+\item Open: $\emptyset$, Closed: $[A, B, D, E, G, C, F, H, I]$. GOAL STATE.
+\end{enumerate}
+
+\subsection*{Depth-First}
+\begin{enumerate}
+\item Open: $[A]$, Closed: $\emptyset$. INITIAL STATE.
+\item Open: $[B, D, E]$, Closed: $[A]$.
+\item Open: $[G, D, E]$, Closed: $[A, B]$.
+\item Open: $[I, D, E]$, Closed: $[A, B, G]$.
+\item Open: $[D, E]$, Closed: $[A, B, G, I]$. GOAL STATE.
+\end{enumerate}
+
+\section*{Question 4}
+\subsection*{Breadth-First}
+The sequence of visited nodes is $[S, A, D, B, E, C, H, F, G]$. The final path is $[S, A, B, H, G]$.
+
+\subsection*{Depth-First}
+The sequence of visited nodes is $[S, A, B, C, H, G]$. The final path is $[S, A, B, H, G]$.
+
+\subsection*{Uniform Cost}
+The sequence of visited nodes is $[S, A, D, E, B, C, F, H, G]$. The final path is $[S, A, B, H, G]$.
+
+\section*{Question 5}
+\subsection*{Uniform Cost}
+\begin{enumerate}
+\item Open: $\{0: 1\}$, Closed: $\emptyset$. INITIAL STATE.
+\item Open: $\{5: 5, 24: 8\}$, Closed: $[1]$.
+\item Open: $\{24: 8, 40: 6\}$, Closed: $[1, 5]$.
+\item Open: $\{39: 10, 40: 6, 47: 3\}$, Closed: $[1, 5, 8]$.
+\item Open: $\{40: 6, 47: 3, 65: 9\}$, Closed: $[1, 5, 8, 10]$.
+\item Open: $\{47: 3, 65: 9, 78: 2\}$, Closed: $[1, 5, 8, 10, 6]$.
+\item Open: $\{54: 4, 65: 9, 78: 2\}$, Closed: $[1, 5, 8, 10, 6, 3]$.
+\item Open: $\{65: 9, 78: 2\}$, Closed: $[1, 5, 8, 10, 6, 3, 4]$.
+\item Open: $\{78: 2, 100: 7\}$, Closed: $[1, 5, 8, 10, 6, 3, 4, 9]$.
+\item Open: $\{100: 7\}$, Closed: $[1, 5, 8, 10, 6, 3, 4, 9, 2]$.
+\item Open: $\emptyset$, Closed: $[1, 5, 8, 10, 6, 3, 4, 9, 2, 7]$. GOAL STATE.
+\end{enumerate}
+
+\subsection*{Greedy Best First}
+\begin{enumerate}
+\item Open: $\{78: 1\}$, Closed: $\emptyset$. INITIAL STATE.
+\item Open: $\{60: 8, 78: 1\}$, Closed: $\emptyset$.
+\item Open: $\{37: 3, 60: 8, 78: 1\}$, Closed: $\emptyset$.
+\item Open: $\{30: 4, 37: 3, 60: 8, 78: 1\}$, Closed: $\emptyset$.
+\item Open: $\{35: 9, 37: 3, 60: 8, 78: 1\}$, Closed: $[4]$.
+\item Open: $\{0: 7, 35: 9, 37: 3, 60: 8, 78: 1\}$, Closed: $[4]$.
+\item Open: $\{35: 9, 37: 3, 60: 8, 78: 1\}$, Closed: $[4]$. GOAL STATE.
+\end{enumerate}
+
+\subsection*{$A^*$}
+\begin{enumerate}
+\item Open: $\{78: 1\}$, Closed: $\emptyset$. INITIAL STATE.
+\item Open: $\{80: 5, 84: 8\}$, Closed: $[1]$.
+\item Open: $\{84: 8, 100: 6\}$, Closed: $[1, 5]$.
+\item Open: $\{84: 3, 96: 10, 100: 6\}$, Closed: $[1, 5, 8]$.
+\item Open: $\{84: 4, 96: 10, 100: 6\}$, Closed: $[1, 5, 8, 3]$.
+\item Open: $\{96: 10, 100: 6, 107: 9\}$, Closed: $[1, 5, 8, 3, 4]$.
+\item Open: $\{100: 9, 100: 6\}$, Closed: $[1, 5, 8, 3, 4, 10]$.
+\item Open: $\{100: 7, 100: 6, 123: 2\}$, Closed: $[1, 5, 8, 3, 4, 10, 9]$.
+\item Open: $\{100: 6, 123: 2\}$, Closed: $[1, 5, 8, 3, 4, 10, 9, 7]$. GOAL STATE.
+\end{enumerate}
+
+\section*{Question 6}
+\begin{enumerate}[a.]
+\item No, it is less informed since it does not take into account the maze.
+\item Yes, since both heuristic functions are admissible, selecting one or the other (based on the max) must be admissible.
+\item Yes, since both heuristic functions are admissible, selecting one or the other (based on the min) must be admissible.
+\item No, if both heuristic functions are admissible, there is no guarantee that their sum is admissible.
+\item Yes, since both heuristic functions are admissible, their difference must be admissible.
+\item Consider the case where the actual distance is 100. Clearly, $h2(n) = 50$ is admissible. $2.5 \times 50 = 125$, though, is clearly not admissible since $125 \not\leq 100$. By counter-example, clearly $h(n) = 2.5 \times h2(n)$ is not admissible.
+\end{enumerate}
+
+\section*{Question 7}
+I propose the following heuristic function: the estimated distance of each white tile is equal to the number of black tiles to its left. The goal state, then, is zero.
+
+This heuristic is admissible because the minimum value to move a white tile to the left of a black tile is one. Since the heuristic of this case is exactly one, clearly we are not over-estimating -- ie. our heuristic is admissible.
+
+This heuristic is not based on the location of the empty tile. Since this empty tile's location does not affect the heuristic, clearly the heuristic is monotonic with respect to the independant variable of the empty tile's location.
+
+This heuristic is informed since it takes into account the real locations and relative locations of the tiles.
+
+\end{document}
