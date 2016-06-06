@@ -1,4 +1,4 @@
-include ../../latex.Makefile
+include ../latex.Makefile
 
 
 all: wkrpt.pdf
