@@ -1,0 +1,108 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{CS 458 --- Assignment 2}
+\author{Kevin Carruthers (kcarruth - 20463098)}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+\subsection*{Part A}
+\subsubsection*{Part i}
+In the below list of steps, we refer to two chats: one between Bob and Alice, one between Mallory and Alice.
+\begin{enumerate}
+\item Bob send $r_1$ to Alice.
+\item Mallory sends $r_1$ to Alice.
+\item Alice picks $r_2$ and sends Mallory $y_1 = f(K, r_1, r_2)$.
+\item Alice picks $r_3$ and sends Bob $y_2 = f(K, r_1, r_3)$. This message is re-written by Mallory to send $r_2$ and $y_1$.
+\item Bob receives $r_2$ and $y_1$ from Alice, validates it correctly, sends back $y_3 = f(K, r_2)$.
+\item Alice fails to validate $y_3$ from Bob and aborts their chat.
+\item Mallory sends $y_3$ to Alice. Alice now thinks Mallory is Bob.
+\end{enumerate}
+
+\subsubsection*{Part ii}
+For this section, Mallory first listens to a conversation completely and then intercepts Alice's next attempt to chat with Bob.
+
+By overhearing their first protocol, Mallory hears $r_1$, $r_2$, and the results of applying \code{MyF} to them ($y_1$). When Mallory intercepts the first message from Alice (containing $r_1^\prime$), Mallory sends back some $r_2^\prime$ such that $18302628885633695807 \& r_1 + r_2 = 18302628885633695807 \& r_1^\prime + r_2^\prime$. In this way, \code{MyF(K, $r_1$, $r_2$)} would be equal to \code{MyF(K, $r_1^\prime$, $r_2^\prime$)} and so Mallort can send $y_1$ and $r_2^\prime$ to Alice. She will validate this correctly, and thus assume Mallory is Bob.
+
+\subsubsection*{Part iii}
+For this attack, we execute the same procedure as in ii. Rather than finding an $r_2^\prime$ such that $18302628885633695807 \& r_1 + r_2 = 18302628885633695807 \& r_1^\prime + r_2^\prime$, we instead find an $r_2^\prime$ such that $r_1 + r_2 \mod{2^{64}} = r_1^\prime + r_2^\prime \mod{2^{64}}$.
+
+\subsubsection*{Part iv}
+For this section, Mallory listens to conversations initiated by Alice and records them. As soon as Alice sends the same $r_1$ as a previous conversation, Mallory can simply intercept the communication and play back the previous conversation wherein Alice first sent that $r_1$.
+
+\subsection*{Part B}
+The authentication factors used by the bank are her credit card and her PIN. The first factor is ``something you have'' and the second is ``something you know''.
+
+The bank identifies Alice through the above authentication method and Alice identifies the bank by inspecting the ATM and checking the logo on it.
+
+\section*{Question 2}
+\subsection*{Part A}
+\begin{align*}
+FAR &= \sum_{i=0}^3 \begin{pmatrix}8 \\i\end{pmatrix} 0.07^{8-i} 0.93^i \\
+    &= 0.0000786 = 0.00786\% \\
+FRR &= \sum_{i=0}^3 \begin{pmatrix}8 \\i\end{pmatrix} 0.12^{8-i} 0.88^i \\
+    &= 0.00101 = 0.101\% \\
+\end{align*}
+
+\begin{align*}
+P(S|L) &= \frac{P(L|S)P(S)}{P(L)} \\
+       &= \frac{(1 - 0.00101) \times 0.08}{0.08(1 - 0.00101) + 0.92(0.00786)} \\
+       &= 0.9170261983880739 = 91.703\% \\
+\end{align*}
+
+\section*{Question 3}
+\subsection*{Part A}
+A public encryption key may allow for signature-based virus detection tools to more-easily detect TeslaCrypt.
+
+\subsection*{Part B}
+Keeping these methods secret form the public also keeps htem secret from the attackers, thus preventing the attackers from modifying their program such that these methods would no longer work.
+
+\subsection*{Part C}
+The author means the algorithm is applied fourteen times in sequence to each 128-bit block of original data.
+
+\subsection*{Part D}
+They may have been unwilling to continue running their ``business'' and altruistically wanted users currently infected to be able to decrypt their files.
+
+\section*{Sploits}
+\subsection*{Sploit 1}
+This sploit works by performing a GET request against vote.php with a given userid, post id, and vote value. Considerations here include: picking a user with voting privileges; picking a useful vote parameter -- experimentally, we determined vote=1 is used for upvoting and vote=2 is for downvoting; and picking a content id of a post rather than a comment.
+
+This sploit was discovered by URL investigation; when logged in normally, a user's voting mechanism is to simply click a link which makes the above GET request for that user. Inspection of this mechanism suggested manual modification of the request parameters may allow us to bypass authentication.
+
+This exploit shows that the principle of ``Complete Mediation'' was violated, since our authentication level was not checked when performing this action.
+
+\subsection*{Sploit 2}
+This sploit works by finding a user's password present in plaintext on a word-readable file. Though three of the four passwords are not accepted, the password listed for user `nasghar' has not been changed since its inclusion in this file. By following the web-app's standard login flow with this username and password, we can authenticate as that user.
+
+This sploit was discovered by examining a temporary file left on the server and world-accessible: index.php~. This file contains a comment referencing `localhost/files123'. Visiting this url shows a promising file: oldpasswords00.txt. Investigating this file shows a list of username/password pairs. From there, it is simple effort to attempt each pair to see if any are valid.
+
+This exploit shows that the principle of ``Economy of Mechanism'' was violated, since passwords were stored in multiple places with varying levels of security, thus providing an unwanted (and unsecured!) access path.
+
+\subsection*{Sploit 3}
+This sploit works by decoding an unsalted md5 hash present within the web-app's database. The hashes were run through a rainbow table (emulated in this sploit) to recover the original passwords. Though only half of the passwords could be recovered this way (given the rainbow table at hashkiller.co.uk/md5-decrypter.aspx), this allowed us to gain the passwords of alice, bob, errin.atwater, and j3tracey.
+
+This sploit involved two steps: finding the database file, and decrypting the hashes. The former was discovered similarly to the previous exploit, by examining index.php~ to find the files123 folder which contained the database itself. This file could then be opened with sqlite, thus allowing us to read the `users' table. The hashes in this table were then put through a rainbow-table-based MD5 decryption tool -- MD5 being chosen after following index.php~ to core.php~ to db\_functions.php~ wherein the password comparison is performed with an md5 encoding -- to return to us the plaintext passwords.
+
+This exploit shows that the principles of ``Economy of Mechanism'' and ``Separation of Privilege'' were violated. The former is true since the database itself was poorly protected, thus providing an unwanted access path. The latter is true since obtaining the user's hashed password was enough to completely compromise their account, which would not be possible given some second factor of authentication.
+
+\subsection*{Sploit 4}
+This sploit works by exploiting the login/confirm action; users are given hashes which are used to confirm a login, thus accessing confirm.php with one of these hashes logs us in as that user. Given that this hash value is only set for a user during the login process but is otherwise unset, using the empty hash logs us in as the first user in the database, ie. `dstinson'.
+
+This sploit was discovered first by reading the post on the web-app entitled ``confirming accounts?''. The post references this confirm function and shows that it takes a hash as a GET parameter. By examining the function called by this route (in db\_functions.php~), we can see that it does a comparison against the user's hash (stored in the database). Since all user hashes are empty in the database (which we can find in the files123 folder), attempting the empty string in the GET request is a natural `guess'.
+
+This exploit shows that the principle of ``Fail-Safe Defaults'' was violated, since the case of using the empty string as a hash (which is the default state of a hash in the user table), should be set to return only a guest account.
+
+\subsection*{Sploit 5}
+This sploit works by performing a SQL injection on the login method. This method is meant to lookup a user with a given name and password, but we can use the lack of SQL-escaping to modify this query to return a specified user without knowledge of their password. Specifically, we modify the query to return the user with the specified hash (which we found in the web-app's database -- see previous sploits for information on how this database was accessed.
+
+This sploit was discovered by following the temporary file index.php~ to core.php~ to db\_functions.php~. Reading the login function, we can see that the login query is formed from the username and hashed password without running either of those through get\_db()->escapeString. Since the username is delivered directly by user input, a SQL injection attack in the login prompt allows us to directly modify the query. In this case, we use the injection to search for `errin.atwater's account by its hash, since ``erinn's account is unhackable!!!!!11111'' if her username is included in the login request.
+
+This exploit shows that the principle of ``Complete Mediation'' was violated, since the user input was not checked for potential problems or attacks.
+
+\end{document}
