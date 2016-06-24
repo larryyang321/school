@@ -84,25 +84,15 @@ abcd & 0    & 980    & 840          \\
 \end{enumerate}
 
 \section*{Question 4}
-% TODO
-Proving that, immediately before we choose w in the loop of Dijkstra’s algorithm in the case illustrated above, D(y) = d(y)
+For every $a$ in $N^\prime$, $D(a) = \delta(a)$ (because we are assuming that $w$ is the first candidate for addition to $N^\prime$ for which that is not true). The path $u \to y$ in the picture is a shortest path.
 
-i.e. the current value of the cost of the path from u to y is indeed equal to the shortest distance from u to y)
+For the shortest path decomposition $u \leadsto x \to y \leadsto w$ to hold, $y$ must be chosen before $w$, meaning that it is in $N^\prime$ before $w$ is chosen. Thus, if $y$ is in $N^\prime$, $D(y) = \delta(y)$ according to the given premise.
 
-Premises:
-For every a in N’, D(a) = d(a) (because we are assuming that w is the first candidate for addition to N’ for which that is not true)
-The path u -> y in the picture is a shortest path
+Assume that $D(y) > \delta(y)$. When $x$ was chosen to be in $N^\prime$, its neighbouring vertices ($y$, in this case) were updated to the minimum of either $D(y)$ or $D(x) + c(x, y)$. Since we hold the premise that $u \to y$ is a shortest path, then we would know that the minimum chosen would be $D(x) + c(x, y)$ as that describes quite literally the shortest path to $x$ and the next edge from $x$ to $y$.
 
-For the shortest path decomposition u ~> x -> y ~> w to hold, y must be chosen before w, meaning that it is in N’ before w is chosen. Thus, if y is in N’, D(y) = d(y) according to the given premise a).
+And for the shortest path decomposition $u \leadsto x \to y \leadsto w$ to hold, $y$ must be chosen before $w$.
 
-Possible answer improvement: somehow prove that y must be chosen before w? Is that what he’s asking?
-
-Possibly useful… confused as to question?
-Assume that D(y) > d(y). When x was chosen to be in N’, its neighbouring vertices (y, in this case) were updated to the minimum of either D(y) or D(x) + c(x, y). Since we hold the premise that u -> y is a shortest path, then we would know that the minimum chosen would be D(x) + c(x, y) as that describes quite literally the shortest path to x + the next edge from x to y.
-
-And for the shortest path decomposition u ~> x -> y ~> w to hold, y must be chosen before w.
-
-at one point D(y) will be a minimum to be chosen by the algorithm. Further, at the moment that it is chosen, it shall be D(y) = d(y) by premise a.
+At one point $D(y)$ will be a minimum to be chosen by the algorithm. Further, at the moment that it is chosen, it shall be $D(y) = \delta(y)$ by the premise.
 
 \section*{Question 5}
 There are 3 possible ways for the Bellman-Ford equation to be incorrect:
