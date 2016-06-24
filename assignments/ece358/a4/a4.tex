@@ -1,0 +1,211 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,enumerate,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{ECE 358 --- Assignment 4}
+\author{Kevin Carruthers, Lara Janecka, Clarisse Schneider}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+\subsection*{Part A}
+\begin{enumerate}[A.]
+\item $1.2.3.0/28$
+\item $1.2.3.0$
+\item $1.2.3.1$
+\item $1.2.3.8$
+\item $1.2.3.0/29$
+\item $1.2.3.1$
+\item $1.2.3.2$
+\item $1.2.3.3$
+\item $10.0.0.0/24$
+\item $10.0.1.0/24$
+\item $1.2.3.8/29$
+\item $1.2.3.8$
+\item $1.2.3.9$
+\item $1.2.3.10$
+\item $10.0.2.0/24$
+\item $10.0.3.0/24$
+\end{enumerate}
+
+\subsection*{Part B}
+\subsubsection*{Part i}
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|l|l}
+Destination & Next Hop & Outgoing Interface \\ \hline
+0.0.0.0/0   & 1.2.3.0  & C                  \\
+1.2.3.0/29  & drop     & -                  \\
+1.2.3.1     & myself   & -                  \\
+1.2.3.2     & 1.2.3.2  & F                  \\
+1.2.3.3     & 1.2.3.3  & F                  \\
+10.0.0.0/24 & 1.2.3.2  & F                  \\
+10.0.1.0/24 & 1.2.3.3  & F                  \\
+\end{tabular}
+\end{table}
+
+\subsubsection*{Part ii}
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|l|l}
+Destination & Next Hop & Outgoing Interface \\ \hline
+0.0.0.0/0   & 1.2.3.0  & D                  \\
+1.2.3.8/29  & drop     & -                  \\
+1.2.3.8     & myself   & -                  \\
+1.2.3.9     & 1.2.3.9  & L                  \\
+1.2.3.10    & 1.2.3.10 & L                  \\
+10.0.2.0/24 & 1.2.3.9  & L                  \\
+10.0.3.0/24 & 1.2.3.10 & L                  \\ \hline
+\end{tabular}
+\end{table}
+
+\section*{Question 2}
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|r|r|r}
+ID   & More & Offset & Total Length \\ \hline
+abcd & 1    & 0      & 500          \\
+abcd & 1    & 480    & 500          \\
+abcd & 1    & 960    & 40           \\
+abcd & 0    & 980    & 840          \\
+\end{tabular}
+\end{table}
+
+\section*{Question 3}
+\begin{enumerate}[a.]
+\item No, because the checksum must be recalculated at every hop as the TTL decreases.
+\item Yes. Since the checksum represents the inverse of the rest of the header, any bits flipped for the rest of the header must be reflected in the checksum in order for the final check to sum to 0 (sum including checksum), and if an odd number of bits were flipped in transit, the checksum wasn’t updated properly to reflect the rest of the header and won’t sum to 0.
+\item Yes, if it doesn’t pass through a NAT, since there is no TTL in UDP the info doesn’t change from hop to hop.
+\item No, because the original transmission or the response could encounter errors and never return to the sender. Thus, the MTU could’ve been supported but the packet never came back because of another unrelated reason.
+\end{enumerate}
+
+\section*{Question 4}
+% TODO
+Proving that, immediately before we choose w in the loop of Dijkstra’s algorithm in the case illustrated above, D(y) = d(y)
+
+i.e. the current value of the cost of the path from u to y is indeed equal to the shortest distance from u to y)
+
+Premises:
+For every a in N’, D(a) = d(a) (because we are assuming that w is the first candidate for addition to N’ for which that is not true)
+The path u -> y in the picture is a shortest path
+
+For the shortest path decomposition u ~> x -> y ~> w to hold, y must be chosen before w, meaning that it is in N’ before w is chosen. Thus, if y is in N’, D(y) = d(y) according to the given premise a).
+
+Possible answer improvement: somehow prove that y must be chosen before w? Is that what he’s asking?
+
+Possibly useful… confused as to question?
+Assume that D(y) > d(y). When x was chosen to be in N’, its neighbouring vertices (y, in this case) were updated to the minimum of either D(y) or D(x) + c(x, y). Since we hold the premise that u -> y is a shortest path, then we would know that the minimum chosen would be D(x) + c(x, y) as that describes quite literally the shortest path to x + the next edge from x to y.
+
+And for the shortest path decomposition u ~> x -> y ~> w to hold, y must be chosen before w.
+
+at one point D(y) will be a minimum to be chosen by the algorithm. Further, at the moment that it is chosen, it shall be D(y) = d(y) by premise a.
+
+\section*{Question 5}
+There are 3 possible ways for the Bellman-Ford equation to be incorrect:
+\begin{itemize}
+\item Not all of the choices represent the smallest distance on a path from $x$ to $y$ through a specific neighbour.
+\item The true smallest distance from $x$ to $y$ is not represented in the set of choices.
+\item The minimum chosen does not represent the true smallest distance from $x$ to $y$.
+\end{itemize}
+
+If the graph is connected, all paths from $x$ to $y$ must go through one of $x$’s edges, and thus one of $x$’s neighbours. Let’s call that neighbour $w$. So $d_w(y)$ is the smallest distance from $w$ to $y$, and $y \leadsto w \to x$ is the shortest path from $y$ to $x$ through $w$. In order to minimize the path from $y$ to $x$ with the stipulation that it includes the edge $(w, x)$ implies that the path from $y$ to $w$ must be minimized, thus combining $d_w(y)$ and $c(w, x)$. Thus each value included as a choice for the minimum represents the smallest path from $y \leadsto w \to x$ where $w$ is one of $x$’s neighbours.
+
+The second is easy to disprove: the shortest path from $x$ to $y$ must go through one of $x$’s neighbours, and thus the shortest path must include one of $x$’s neighbours. Thus the smallest distance must be represented by sum of the shortest distance to $x$’s neighbour which is included in the shortest path, plus the edge from that neighbour to $x$.
+
+For the third, assume that the true smallest distance is actually not the minimum of the choices provided. But by that definition, there is a smaller value which can represent the distance from $x$ to $y$, which contradicts our given definition.
+
+Therefore the Bellman-Ford equation is correct.
+
+\section*{Question 6}
+It takes $O(d)$ iterations for a network to generate a minimum cost routing table for each of its nodes, where $d$ is the diameter of the network. At each iteration a nodes knowledge of the full network is only the subgraph of nodes distance $i$ away from that node, where $i$ is the number of iterations that have occured. So after $d$ iterations each node will know of every other node in the network. No node can be farther than $d$ iterations away because each node broadcasts its presence which changes the table of its neighbors causing them to broadcast, and so on. It can thus be said that knowledge of a node will travel by one layer per iteration. Think of it as, at iteration $i$, a node will know everything about the subgraph of all nodes distance $i$ away from it (it does not know of any of their neighbors farther than that). At iteration 1, the routing table for this subgraph is optimal (since we are distance 1 away there is no other route).
+
+Assume that at iteration $i$ the routing tables are optimal. So when we move to iteration $i+1$, we assume that all of our connections to the $i$th distance are optimal so the nodes at the $i+1$th layer, receiving the routing tables from their neighbor nodes at the $i$th layer will know the optimal path to get to the starting node under consideration and update their tables accordingly. Through induction we can say that after $d$ iterations every node will know the optimal route to this starting node. We know that every other node has been doing the exact same procedure for $d$ iterations as well, so we can say that after $d$ iterations all nodes will have a minimum routing table.
+
+\section*{Question 7}
+Let the initial graph $G$ be the following:
+\begin{verbatim}
+A---------B
+|    1    |
+| 1       | 1
+|    5    |   1
+C---------D-------E
+\end{verbatim}
+
+Assume the event causing the Distance-Vector calculation to run is the link between nodes $D$ and $E$ ``failing'' -- that is, becoming infinite.
+
+In this case, we end up with a routing loop of size four from D to C to A to B for the following reason:
+
+Before the edge from D to E fails (values for distance to A, B, C, D, and E):
+\begin{itemize}
+\item C advertises to:
+\begin{itemize}
+\item A (1, $\infty$, 0, $\infty$, $\infty$)
+\item D (1, 2, 0, 3, 4)
+\end{itemize}
+\item A advertises to:
+\begin{itemize}
+\item B (0, 1, 1, $\infty$, $\infty$)
+\item C (0, 1, 1, 2, 3)
+\end{itemize}
+\item B advertises to:
+\begin{itemize}
+\item D (1, 0, 2, 1, $\infty$)
+\item A (1, 0, $\infty$, 1, 2)
+\end{itemize}
+\item D advertises to:
+\begin{itemize}
+\item E (2, 1, 3, 0, 1)
+\item B ($\infty$, 1, $\infty$, 0, 1)
+\item C (2, 1, 3, 0, 1)
+\end{itemize}
+\end{itemize}
+
+When the edge from D to E fails, the edge from D to E becomes infinity. D then choses C to route to E since:
+\begin{itemize}
+\item D neighbours previously advertised as distance to E:
+\begin{itemize}
+\item Via B: $\infty$
+\item Via C: 4
+\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+\item D advertises to:
+\begin{itemize}
+\item E (2, 1, 3, 0, 7)
+\item B ($\infty$, 1, $\infty$, 0, 7)
+\item C (2, 1, 3, 0, $\infty$)
+\end{itemize}
+\item C chooses A to route to E
+\begin{itemize}
+\item C’s neighbours previously advertised as distance to E:
+\begin{itemize}
+\item Via A: 3
+\item Via D: $\infty$
+\end{itemize}
+\end{itemize}
+\item A chooses B to route to E
+\begin{itemize}
+\item A’s neighbours previously advertised as distance to E:
+\begin{itemize}
+\item Via B: 2
+\item Via C: $\infty$
+\end{itemize}
+\end{itemize}
+\item B chooses D to route to E
+\begin{itemize}
+\item B’s neighbours previously advertised as distance to E:
+\begin{itemize}
+\item Via D: 7
+\item Via A: $\infty$
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+Therefore routing D updates to choose C to route to E, updates its advertisements, and kicks off a routing loop from D to C to A to B and back to D.
+
+\end{document}
