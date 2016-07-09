@@ -18,6 +18,35 @@ We implemented DFS by visiting each node in DFS-search order and only visiting n
 
 We implemented A-Star by visiting each node in BFS-search order after applying a heuristic algorithm and only visiting new nodes if we had not yet visited them and they were valid nodes (eg. within the confines of the maze and not blocked). This heuristic algorithm used the Euclidean distance between potential and target nodes as the expected cost since this function is informed and admissible (we can not move diagonally).
 
+\subsection*{Algorithm / Code Sample}
+We used the below function to generate the possible movelist for each of BFS, DFS, and A-Star:
+\begin{lstlisting}[breaklines=true, language=python]
+def moves(maze, position):
+    # up, right, down, left
+    possible = [(position[0], position[1] + 1),
+                (position[0] + 1, position[1]),
+                (position[0], position[1] - 1),
+                (position[0] - 1, position[1])]
+
+    actual = list()
+    length = len(maze)
+    for x, y in possible:
+        if x < 0 or x >= length or y < 0 or y >= length:
+            continue
+        if maze[x][y]:
+            continue
+        actual.append((x, y))
+    return actual
+\end{lstlisting}
+
+For the former two, we simply implemented BFS and DFS by rote; for the latter, we used the following cost function as a sort key:
+\begin{lstlisting}[breaklines=true, language=python]
+cost = lambda distance, current: distance + ((end[0] - current[0]) ** 2 + (end[1] - current[1]) ** 2) ** 0.5
+\end{lstlisting}
+
+\subsection*{Memory and Time Complexity Analysis}
+For all three algorithms, the time and space complexity is $O(4^d)$, where $d$ is the maximal search depth.
+
 \subsection*{Sample Output}
 \begin{lstlisting}[breaklines=true]
 Breadth-First Search: start = (11, 2), end = (19, 23)
@@ -42,7 +71,435 @@ A-Star Search: start = (0, 0), end = (24, 24)
 ([(0, 0), (0, 1), (1, 1), (1, 2), (2, 2), (2, 3), (3, 3), (3, 4), (4, 4), (4, 5), (5, 5), (6, 5), (7, 5), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9), (9, 9), (9, 10), (10, 10), (10, 11), (11, 11), (11, 12), (12, 12), (12, 13), (13, 13), (13, 14), (14, 14), (15, 14), (15, 15), (15, 16), (16, 16), (16, 17), (17, 17), (17, 18), (17, 19), (17, 20), (17, 21), (18, 21), (19, 21), (20, 21), (21, 21), (21, 22), (22, 22), (22, 23), (23, 23), (23, 24), (24, 24)], 49, 448)
 \end{lstlisting}
 
+\subsection*{Working Code}
+\lstinputlisting[language=python]{q1.py}
+
+\section*{Question 2}
+\subsection*{Part 1}
+The program starts by building the starting board state. This is represented as a tuple (the set of all rows), containing a tuple (the cells in that row), containing a tuple to hold the number of stones and the current owner of that cell. This board is then used in a loop that checks for a win condition and alternates players. The random player generates all possible children, then selects one at random. The rational player generates all possible children and recurses on them. If a win condition has been reached, or the depth limit is reached the function applies the evaluation heuristic and returns that value. As this function recurses it applies the min max algorithm along with alpha beta pruning to get more optimal values. Eventually it finishes and returns the best possible next move.
+
+The function to generate children works by iterating through all squares on the board and checking if the current user has stones there. If they do it checks all possible directions of movement and if movement is possible it generates a new child board state as if the player were to move that way next.
+
+\subsection*{Part 2}
+The search agent uses the win condition of either player having no available children (or a max depth reached) as its leaf node case. For each potential child state the search function keeps track of the optimal play in a msx/minVal variable. This variable is also used to shift the current alpha or beta values. For convience of return values, the board state of the current best child is stored in a bestChild variable. If the condition for alpha beta pruning is acheived (beta being less than alpha), then the loop is broken and the current best value is returned.
+
+\subsection*{Part 3}
+A few different evaluation heuristics were tried when creating this program. These were evaluated based on the percentage of games they won, and the number of turns it took them to win to break ties.
+
+The first was evaluating the number of potential moves that the rational player could make and subtract the number of moves the random player could make. The second was to evaluate the number of squares owned by the rational player and subtract the number owned by the random player. The final heuristic was to apply a weighting scheme to squares when evaluating owner ship, based on the number of directions you could move in from there. For instance corners were only worth 3 while center squares were worth 8.
+
+Games that exceeded 50 moves were considered invalid to allow for more games to be run within time constraints.
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Heuristic} & \textbf{Win Rate} & \textbf{Average Turns}  \\ \hline
+\textbf{Number of Moves} & 81\% & 131  \\ \hline
+\textbf{Number of Squares} & 65\% & 432  \\ \hline
+\textbf{Weighted Squares} & 79\% & 312  \\ \hline
+\end{tabular}
+\end{center}
+
+A large portion of games ended in a draw as they worked themselves into a looping state. This resulted in all of the heruistics converging on roughly 60\% and the max of 500 rounds. Because of this these results were removed from the above values.
+
+All three heuristics performed reasonably well, but the heuristic that counted the number of moves available was the best in both categories. This is probably due to it most closely representing reality in its evaluation.
+
+\subsection*{Part 4}
+Here is some sample output from a game in which the rational player won. For brevity squares owned by the rational player are denoted A and B for the random player.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 1  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 2  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 7  & 0: 0  & 0: 0  & B: 10  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 1
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 1  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 2  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 7  & 0: 0  & 0: 0  & B: 10  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 1
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 7  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+A: 1  & B: 2  & 0: 0  & 0: 0  \\ \hline
+A: 2  & 0: 0  & B: 1  & 0: 0  \\ \hline
+A: 7  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 2
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 7  & 0: 0  & 0: 0  & A: 4  \\ \hline
+A: 1  & B: 2  & A: 2  & 0: 0  \\ \hline
+A: 2  & A: 1  & B: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 2
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & 0: 0  & 0: 0  & A: 4  \\ \hline
+A: 1  & 0: 0  & A: 2  & 0: 0  \\ \hline
+A: 2  & A: 1  & B: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 3
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & 0: 0  & A: 1  & A: 4  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & B: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+This move really helped the rational player because it allowed them to corner 9 of the random players stones. By moving here the rational player greatly reduces the number of potential moves the random player could take while leaving themselves relatively free to move.
+
+Random players turn 3
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & A: 4  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & B: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 4
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & B: 1  & A: 2  \\ \hline
+0: 0  & 0: 0  & 0: 0  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 4
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & 0: 0  & A: 2  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 5
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 2  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 5
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & 0: 0  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 2  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 6
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 2  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 6
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 2  \\ \hline
+0: 0  & B: 1  & 0: 0  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 7
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & B: 1  & 0: 0  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 7
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 8
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & 0: 0  & B: 1  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 8
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & B: 1  & 0: 0  & A: 1  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 9
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & B: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 9
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+B: 1  & 0: 0  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 10
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & 0: 0  & 0: 0  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 10
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+B: 1  & A: 1  & 0: 0  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 11
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+B: 1  & A: 1  & 0: 0  & A: 1  \\ \hline
+0: 0  & A: 1  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 11
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 2  & A: 1  \\ \hline
+0: 0  & A: 1  & 0: 0  & A: 1  \\ \hline
+B: 1  & A: 1  & 0: 0  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 12
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & 0: 0  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 12
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & 0: 0  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 13
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 13
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 14
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+0: 0  & A: 1  & A: 1  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+This move does not seem like the most optimal move to make because it frees up 9 of the random player's stones for movement, but if you look at the other potential moves this is in a 4 way tie with other moves. There was no way to block off the stone in the bottom left corner without  leaving room for either it or the set of 9 stones to move. The algorithm probably looked ahead and saw that it could win quickly using this move so it took it.
+
+Random players turn 14
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & A: 1  & 0: 0  & 0: 0  \\ \hline
+B: 9  & A: 1  & A: 1  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 15
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & A: 1  & A: 1  & 0: 0  \\ \hline
+B: 9  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+This move looks fairly pointless since the rational player moved a stone currently doing nothing to help cage in the random player, but looking ahead you can see that the rational player is moving that stone closer to help fill in the gap there. Once again, this was probably discovered using the algorithm's look ahead.
+
+Random players turn 15
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & A: 1  & 0: 0  \\ \hline
+0: 0  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 16
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & 0: 0  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 16
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & 0: 0  & A: 1  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 17
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+0: 0  & B: 9  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Random players turn 17
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & 0: 0  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+
+Rational players turn 18
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+B: 9  & A: 1  & 0: 0  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+A: 1  & A: 1  & A: 1  & A: 1  \\ \hline
+B: 1  & A: 1  & A: 1  & 0: 0  \\ \hline
+\end{tabular}
+\end{center}
+Rational player wins
+Rational player won 0.1
+Random player won 0.0
+
+\subsection*{Working Code}
+\lstinputlisting[language=python]{q2.py}
+
 \section*{Question 3}
+The strategy for Tabu search is to allow for some moves which make the solution worse in order to escape from local maxima. We performed the below modifications to the standard Tabu search implementation, as requested:
+
 \subsection*{Modifying the Original Solution}
 Using varying solutions, we see varying results.
 \begin{lstlisting}[breaklines=true]
@@ -145,6 +602,56 @@ Using a frequency-based Tabu list length, we get a different result.
 \begin{lstlisting}[breaklines=true]
 [[6, 5, 10, 3, 17], [13, 1, 12, 14, 19], [7, 20, 8, 2, 15], [9, 4, 11, 18, 16]] 2804
 \end{lstlisting}
+
+\subsection*{Algorithm / Sample Code}
+We used the below algorithm for determining potential neightbours:
+\begin{lstlisting}[breaklines=true,language=python]
+def get_neighbours(solution, tabu_list, distances, flows, best_cost):
+    sols = []
+    for i, _ in enumerate(solution):
+        for j, _ in enumerate(solution[i]):
+            for k, _ in enumerate(solution):
+                for l, _ in enumerate(solution[k]):
+                    if i == k and j == l:
+                        continue
+
+                    new_solution = copy.deepcopy(solution[:])
+
+                    temp = new_solution[i][j]
+                    new_solution[i][j] = new_solution[k][l]
+                    new_solution[k][l] = temp
+
+                    if tabu_list[i][j] or tabu_list[k][l]:
+                        if best_cost < get_cost(distances, flows,
+                                                new_solution):
+                            continue
+
+                    sols.append(copy.deepcopy(new_solution[:]))
+
+    return sols
+\end{lstlisting}
+
+as well as the following one for determining the cost of each neighbour:
+\begin{lstlisting}[breaklines=true,language=python]
+def get_cost(distances, flows, solution):
+    cost = 0
+    for i, from_list in enumerate(solution):
+        for j, from_item in enumerate(from_list):
+            for k, to_list in enumerate(solution):
+                for l, to_item in enumerate(to_list):
+                    cost += (distances[i * 5 + j][k * 5 + l]
+                             * flows[from_item - 1][to_item - 1])
+
+    return cost
+\end{lstlisting}
+
+\subsection*{Memory and Time Complexity Analysis}
+The time complexity is bounded by the above algorithm for finding the cost of our neighbours, which gives us a complexity of $O(m^2n^2)$, where $m$ and $n$ are the height and width of the solution matrix. Since this algorithm is applied to each neighbour, we could describe this as $O(km^2n^2)$ with $k$ as the number of neighbours, but this value is a constant and so we ignore it in time complexity calculations.
+
+Similarly, the memory complexity is bounded by the number of neighbours, some constant value, times their size, which is $O(mn)$.
+
+\subsection*{Working Code}
+\lstinputlisting[language=python]{q3.py}
 
 \section*{Question 4}
 \subsection*{Part A}
@@ -676,5 +1183,50 @@ Final cost: 1174.0
  [5, 53, 56, 10, 8, 19, 18],
  [43, 27, 14, 9, 22, 15]]
 \end{lstlisting}
+
+\subsection*{Algorithm / Code Sample}
+The below code shows how we get a nieghbout and how we measure the cost of said neighbour.
+
+\begin{lstlisting}[breaklines=true,language=python]
+def get_neighbour(self):
+  routes = range(len(self.paths))
+  from_path, to_path = random.choice(routes), random.choice(routes)
+  if not self.paths[from_path]:
+      return self.get_neighbour()
+
+  from_index = random.choice(range(len(self.paths[from_path])))
+  to_index = random.choice(list(range(len(self.paths[to_path]))) or [0])
+
+  if from_path == to_path and from_index == to_index:
+      return self.get_neighbour()
+
+  paths = self.paths[:]
+
+  item = paths[from_path].pop(from_index)
+  paths[to_path].insert(to_index, item)
+  return paths
+
+def get_cost(paths, nodes, costs):
+  routes = [[1] + path + [1] for path in paths]
+
+  c = 0
+  for i, path in enumerate(paths):
+      for city in path:
+          c += costs[city]
+      for back, path in zip(routes[i][:-1], routes[i][1:]):
+          xd = nodes[back][0] - nodes[path][0]
+          yd = nodes[back][1] - nodes[path][1]
+          c += ((xd ** 2 + yd ** 2)) ** 0.5
+
+  return c
+\end{lstlisting}
+
+\subsection*{Memory and Time Complexity Analysis}
+The time complexity of this algorithm is bounded by $O(mn)$, where $n$ is the upper bound of the length of any path and $m$ is the number of paths (ie. the number of vehicles). This bound is determined by the above \code{get\_cost} algorithm, which iterates through each pair of items in each path for each path.
+
+The memory complexity of this algorithm is bounded by $O(m^2)$, since it is bounded by the generation of neighbours, which generates $m$ paths then, for each of their neighbours, generates $m$ more neighbouring paths.
+
+\subsection*{Working Code}
+\lstinputlisting[language=python]{q5.py}
 
 \end{document}
