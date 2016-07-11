@@ -1,0 +1,34 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,enumerate,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{ECE 358 --- Assignment 6}
+\author{Kevin Carruthers, Lara Janecka, Clarisse Schneider}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+The route this packet travels is $A \to R1 \to R2 \to R3 \to B$.
+
+Since we are using hot-potato routing, the packet should follow the shortest path between $A$ and $B$. Since each hop has a cost of 1 and there exist only two possible sequences of hops ($R1 \to R2 \to R3$ and $R1 \to R4 \to R5 \to R6$), we can clearly see that the packet will follow the shorter of these, ie. $R1 \to R2 \to R3$.
+
+\section*{Question 2}
+% TODO
+
+\section*{Question 3}
+\subsection*{Part A}
+The worst case number of packets a node in $G$ can receive is equal to its number of edges, or connected nodes. Since each of these nodes can not forward the packet more than once, clearly the worst case involves each of these nodes forwarding the packet once.
+
+\subsection*{Part B}
+The worst case number of packets a node in $G$ can recieve is equal to its number of edges, or connected nodes. Since each of these may feasibly by on the shortest path from the source node (eg. assume the case wherein all neighbours exist on equivalent-length shortest paths), it is possible that each of these may forward the broadcast packet to the destination node.
+
+If we define shortest paths uniquely, that is, in the case of ``ties'' in terms of path length we simply select one to be the ``shortest path'' and disregard other paths, the wrost case number of received packets is one, since each node will have one (and only one) adjacent neighbour along the shortest path.
+
+\subsection*{Part C}
+The worst case number of broadcasts is one, since a spanning tree defines a single route along which the packets will travel wherein each node is forwarded to exactly once.
+
+\end{document}
