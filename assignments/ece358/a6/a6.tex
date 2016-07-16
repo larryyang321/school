@@ -12,12 +12,12 @@
 \maketitle\HRule
 
 \section*{Question 1}
-The route this packet travels is $A \to R1 \to R2 \to R3 \to B$.
+The route this packet travels is $A \to R1 \to R4 \to R5 \to R6 \to B$.
 
-Since we are using hot-potato routing, the packet should follow the shortest path between $A$ and $B$. Since each hop has a cost of 1 and there exist only two possible sequences of hops ($R1 \to R2 \to R3$ and $R1 \to R4 \to R5 \to R6$), we can clearly see that the packet will follow the shorter of these, ie. $R1 \to R2 \to R3$.
+Since we are using hot-potato routing, the packet must leave the AS as soon as it possible can, thus moving from $R1$ to $R4$ to escape the local AS.
 
 \section*{Question 2}
-% TODO
+$X$ advertises to $B$ that the subnet $5.6.7.0/24$ can be reached by hopping to $200.0.0.0/8$. $X$ advertises to $C$ that the subnet $1.2.0.0/16$ can be reached by hopping to $100.0.0.0/8$.
 
 \section*{Question 3}
 \subsection*{Part A}
@@ -29,6 +29,6 @@ The worst case number of packets a node in $G$ can recieve is equal to its numbe
 If we define shortest paths uniquely, that is, in the case of ``ties'' in terms of path length we simply select one to be the ``shortest path'' and disregard other paths, the wrost case number of received packets is one, since each node will have one (and only one) adjacent neighbour along the shortest path.
 
 \subsection*{Part C}
-The worst case number of broadcasts is one, since a spanning tree defines a single route along which the packets will travel wherein each node is forwarded to exactly once.
+The worst case number of copies is zero, since a spanning tree defines a single route along which the packets will travel wherein each node is forwarded to exactly once. Since each node node will only receive one broadcast, it will clearly not receive any copy of that broadcast.
 
 \end{document}
