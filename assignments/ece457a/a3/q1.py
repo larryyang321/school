@@ -48,7 +48,7 @@ def weighted_choice(choices, total):
 def fitness(Kp, Ti, Td):
     ISE, t_r, t_s, M_p = stepresponse(Kp, Ti, Td)
 
-    return 1. / float(ISE/10. + t_r + t_s + M_p*10.)
+    return 1. / float(ISE + t_r + t_s + M_p)
 
 def genetic(population, crossover, mutation, iterations):
     print('Running GA with p={}, itt={}, c%={}, m%={}'.format(population,
@@ -77,10 +77,6 @@ def genetic(population, crossover, mutation, iterations):
               flush=True)
         children = []
 
-        # elite
-        for item in elite[:2]:
-            current[item] = fitness(item[0], item[1], item[2])
-
         # parent-selection
         while len(children) < population:
             parent = weighted_choice(current, cost)
@@ -104,7 +100,6 @@ def genetic(population, crossover, mutation, iterations):
                 children.append(child0)
                 children.append(child1)
             else:
-                # TODO: this allows duplicate children... is that OK?
                 children.append(parent)
 
         # mutation
@@ -120,6 +115,10 @@ def genetic(population, crossover, mutation, iterations):
                     c = tuple([random.choice(range_Kp), c[1], c[2]])
 
             current[c] = fitness(c[0], c[1], c[2])
+
+        # elite
+        for item in elite[:2]:
+            current[item] = fitness(item[0], item[1], item[2])
 
         elite = sorted(current, key=current.get, reverse=True)
         cost = sum(current.values())
