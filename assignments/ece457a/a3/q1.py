@@ -48,7 +48,7 @@ def weighted_choice(choices, total):
 def fitness(Kp, Ti, Td):
     ISE, t_r, t_s, M_p = stepresponse(Kp, Ti, Td)
 
-    return float(ISE + t_r + t_s + M_p)
+    return 1. / float(ISE/10. + t_r + t_s + M_p*10.)
 
 def genetic(population, crossover, mutation, iterations):
     print('Running GA with p={}, itt={}, c%={}, m%={}'.format(population,
@@ -69,16 +69,20 @@ def genetic(population, crossover, mutation, iterations):
     current = {k: 0 for k in zip(pop_Kp, pop_Ti, pop_Td)}
     for Kp, Ti, Td in current.keys():
         current[(Kp, Ti, Td)] = fitness(Kp, Ti, Td)
-    elite = sorted(current, key=current.get)
+    elite = sorted(current, key=current.get, reverse=True)
     cost = sum(current.values())
 
     for itt in range(iterations):
-        # print('> iteration {} of {}... '.format(itt + 1, iterations), end='',
-        #       flush=True)
+        print('> iteration {} of {}... '.format(itt + 1, iterations), end='',
+              flush=True)
         children = []
 
+        # elite
+        for item in elite[:2]:
+            current[item] = fitness(item[0], item[1], item[2])
+
         # parent-selection
-        while len(children) < population - 2:
+        while len(children) < population:
             parent = weighted_choice(current, cost)
 
             # crossover
@@ -117,16 +121,11 @@ def genetic(population, crossover, mutation, iterations):
 
             current[c] = fitness(c[0], c[1], c[2])
 
-        # elite
-        for item in elite[:2]:
-            current[item] = fitness(item[0], item[1], item[2])
-
-        print(current)
-        elite = sorted(current, key=current.get)
+        elite = sorted(current, key=current.get, reverse=True)
         cost = sum(current.values())
 
-        best_matches.append(current[elite[0]])
-        # print('done!')
+        best_matches.append(1 - current[elite[0]])
+        print('done!')
 
     # graph
     plot.clf()
@@ -148,10 +147,10 @@ def main():
                     iterations=iterations)
 
     genetic(population=50, crossover=0.6, mutation=0.05, iterations=50)
-    genetic(population=50, crossover=0.6, mutation=0.85, iterations=50)
+    genetic(population=50, crossover=0.6, mutation=0.30, iterations=50)
 
-    genetic(population=50, crossover=0.5, mutation=0.25, iterations=50)
     genetic(population=50, crossover=0.7, mutation=0.25, iterations=50)
+    genetic(population=50, crossover=0.8, mutation=0.25, iterations=50)
 
 
 if __name__ == '__main__':
