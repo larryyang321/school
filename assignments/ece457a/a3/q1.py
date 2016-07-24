@@ -134,8 +134,8 @@ def genetic(population, crossover, mutation, iterations):
     plot.ylabel('best fitness')
     plot.title('Genetic Algorithm')
     plot.grid(True)
-    plot.savefig('q1-i{}-p{}-c{}-m{}.png'.format(iterations, population,
-                                                 crossover, mutation))
+    plot.savefig('figs/q1/i{}-p{}-c{}-m{}.png'.format(iterations, population,
+                                                      crossover, mutation))
     plot.show()
 
 
