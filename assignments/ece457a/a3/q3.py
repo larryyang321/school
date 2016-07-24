@@ -4,9 +4,9 @@ import sys
 
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=W0611
-import matplotlib.cm as cm
+# import matplotlib.cm as cm
 import matplotlib.pyplot as plot
-import numpy
+# import numpy
 
 
 # vector math
@@ -39,8 +39,8 @@ class Particle:
     ZETA = COGNITIVE + SOCIAL
     assert ZETA > 4.
 
-    INERTIA = 1.0
-    assert 0.8 < INERTIA < 1.2
+    INERTIA = 0.8
+    assert 0.8 <= INERTIA <= 1.2
 
     CONSTRICTION = 2. / abs(2 - ZETA - (ZETA ** 2 - 4 * ZETA) ** (1/2.))
 
@@ -106,8 +106,9 @@ def pso(num_particles, iterations=10):
             fitness = particle.fitness()
             if fitness < best:
                 gbest = particle.position
-                if fitness < pbest:
-                    pbest = fitness
+                best = fitness
+        if best < pbest:
+            pbest = best
 
         for particle in particles:
             particle.update_velocity(gbest, pbest)
@@ -120,7 +121,9 @@ def pso(num_particles, iterations=10):
 
         fig = plot.figure()
         axis = fig.gca(projection='3d')
-        axis.set_zlim(min(z), max(z))
+        axis.set_xlim(-5, 5)
+        axis.set_ylim(-5, 5)
+        axis.set_zlim(-2, 500)
         axis.zaxis.set_major_locator(LinearLocator(10))
         axis.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
