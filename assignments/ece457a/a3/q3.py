@@ -143,7 +143,7 @@ def pso(num_particles, iterations=10):
 
 
 def main():
-    pso(num_particles=20)
+    pso(num_particles=50)
 
 
 if __name__ == '__main__':
