@@ -58,7 +58,7 @@ class Particle:
 
     @staticmethod
     def camelback(x, y):
-        term0 = -(4 - 2.1 * x ** 2 + (x ** 4) / 3.) * x ** 2
+        term0 = (4 - 2.1 * x ** 2 + (x ** 4) / 3.) * x ** 2
         term1 = x * y
         term2 = (-4 + 4 * y ** 2) * y ** 2
         return term0 + term1 + term2
@@ -94,13 +94,13 @@ class Particle:
         self.velocity = Particle.CONSTRICTION |mul| velocity
 
 
-def pso(num_particles, iterations=150):
+def pso(num_particles, iterations=10):
     particles = [Particle() for _ in range(num_particles)]
 
     gbest = None
     pbest = sys.maxsize
 
-    for _ in range(iterations):
+    for itt in range(iterations):
         best = sys.maxsize
         for particle in particles:
             fitness = particle.fitness()
@@ -113,30 +113,30 @@ def pso(num_particles, iterations=150):
             particle.update_velocity(gbest, pbest)
             particle.update_position()
 
+        # graph
+        x, y = zip(*[p.position for p in particles])
+        # x, y = numpy.meshgrid(x, y)
+        z = [p.fitness() for p in particles]
+
+        fig = plot.figure()
+        axis = fig.gca(projection='3d')
+        axis.set_zlim(min(z), max(z))
+        axis.zaxis.set_major_locator(LinearLocator(10))
+        axis.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+        scatter = axis.scatter(x, y, z)
+        # surface = axis.plot_surface(x, y, z, rstride=1, cstride=1,
+        #                             cmap=cm.coolwarm, linewidth=0,
+        #                             antialiased=False)
+        # fig.colorbar(surface, shrink=0.5, aspect=5)
+
+        plot.xlabel('x')
+        plot.ylabel('y')
+        plot.title('Particle Swarm Optimization')
+        plot.savefig('figs/q3/n{}-i{}.png'.format(num_particles, itt))
+        plot.show()
+
         print('{} -> {}'.format(gbest, pbest))
-
-    # graph
-    fig = plot.figure()
-    axis = fig.gca(projection='3d')
-    axis.set_zlim(-3000, 2000)
-    axis.zaxis.set_major_locator(LinearLocator(10))
-    axis.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-    particles = [Particle() for _ in range(250)]
-    x, y = zip(*[p.position for p in particles])
-    x, y = numpy.meshgrid(x, y)
-    z = [p.fitness() for p in particles]
-
-    surface = axis.plot_surface(x, y, z, rstride=1, cstride=1,
-                                cmap=cm.coolwarm, linewidth=0,
-                                antialiased=False)
-    fig.colorbar(surface, shrink=0.5, aspect=5)
-
-    plot.xlabel('x')
-    plot.ylabel('y')
-    plot.title('Particle Swarm Optimization')
-    plot.savefig('figs/q3/n{}.png'.format(num_particles))
-    plot.show()
 
 
 def main():
