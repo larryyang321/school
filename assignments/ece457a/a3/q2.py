@@ -145,7 +145,7 @@ def aco(num_ants=len(cities), online_update=True, q=100.0, rho=0.5,
 
 
 def main():
-    for q in (50.0, 75.0, 100.0, 125.0, 150.0):
+    for q in (75.0, 100.0, 125.0):
         for rho in (0.4, 0.5, 0.6):
             for num_ants in (len(cities) - 5, len(cities), len(cities) + 5):
                 for online_update in (False, True):
