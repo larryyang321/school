@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,bookmark,mathtools,parskip,verbatim,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{CS 458 --- Assignment 3}
+\author{Kevin Carruthers (kcarruth - 20463098)}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+\subsection*{Part A}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{a1network.png}
+\caption{Network Diagram}
+\end{figure}
+
+\subsection*{Part B}
+I would place this single firewall between the internet link and the router, since it is a single point through which each connection must travel and thus covers all traffic.
+
+I would use an application proxy since it covers each case we are interested in: by limiting the types of database queries, we can ensure that no (malicious) customer can alter the available movies, their assigned tier, or the tier of any customer account (including their own).
+
+\subsection*{Part C}
+I would place each firewall between the router and the web server for a given geographical location.
+
+I would continue to use an application proxy since (as explained above) it covers each relevant security case. By placing these geographically, we ensure only that each one monitors a smaller amount of geographically-divided traffic; since this does not change the task it must perform (ie. filtering malicious requests), the firewall(s) continues to function in this configuration.
+
+\section*{Question 2}
+\subsection*{Part A}
+We assume there is roughly an even split between players on the PvP server and players on the PvE server. Our tracker is \code{Server = ``PvE''}. Our set of three queries is:
+\begin{verbatim}
+SELECT SUM(Gold) FROM Players WHERE Username = "XdarksephirothX" OR Server = "PvE";
+SELECT SUM(Gold) FROM Players WHERE Username = "XdarksephirothX" OR Server != "PvE";
+SELECT SUM(Gold) FROM Players WHERE 1 = 1;
+\end{verbatim}
+
+\subsection*{Part B}
+We begin the attack by performing the following queries until one returns (ie. until the size of the set is larger than $k$), ensuring we don't select any users whose usernames begin with the same prefix as out target user (in this case, $D$):
+\begin{verbatim}
+SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%";
+SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" OR USERNAME LIKE "B%";
+SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" OR USERNAME LIKE "B%" OR USERNAME LIKE "C%";
+\end{verbatim}
+
+This gives us a set of users of size at least $k$, which allows us to perform any otherwise too-small query. For example, if a query \code{SELECT COUNT(*) FROM Players WHERE Q} would otherwise not run since it would return a set of size less than $k$, we can instead search for \code{SELECT COUNT(*) FROM Players WHERE Q OR USERNAME LIKE ``A\%'' \dots} and subtract the count of our sample set.
+
+Thus, we can perform a standard binary search on gold using the above set.
+
+For example, we show the first few steps of this search (let the size of the user database be 1000):
+\begin{verbatim}
+> SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%";
+200
+> SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" AND USERNAME = "doomlaser" AND Gold < 10000000000;
+201
+> SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" AND USERNAME = "doomlaser" AND Gold < 5000000000;
+201
+> SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" AND USERNAME = "doomlaser" AND Gold < 2500000000;
+200
+> SELECT COUNT(*) FORM Players WHERE USERNAME LIKE "A%" AND USERNAME = "doomlaser" AND Gold > 2500000000 AND Gold < 3750000000;
+201
+... // etc
+\end{verbatim}
+
+\section*{Question 3}
+\subsection*{Part A}
+The two major issues meant to be solved by this change are that
+\begin{enumerate}
+\item judges can only issue warrants to search property in their districts, or in crimes that involve their districts; and
+\item judges can only issue warrants which allow the search of a single computer, when multiple may be relevant.
+\end{enumerate}
+
+These changes attempt to fix the above issues by allowing judges to grant warrants for any number of computers in any district.
+
+\subsection*{Part B}
+He is referencing technologies like Tor, which allow a potential attacker to anonomize their traffic through a series of other computers; since tracing them would require access to each of those computers, this law might allow law enforcement officials to trace the path back to the source computer; without this law, though, this technology prevents officials from immediately determining the source computer and thus getting a warrant for that device.
+
+\subsection*{Part C}
+\begin{itemize}
+\item Torrents,
+\item Tor, and
+\item Proxies.
+\end{itemize}
+
+\subsection*{Part D}
+In the case of botnets, this new law is a massive breach of privacy for any victim affected by the botnet, since the new laws could allow officials to gain a warrant for their computers without any malicious action on their part.
+
+Officials now may go to any judge to get a warrant (regardless of district), thus unscrupulous officials may visit judges who do not have a strong understanding of the technology involved and get warrants for more machines than they require access to.
+
+Since an unknown district may imply a device is in Canada, this law allows US officials to get warrants for Canadian devices.
+
+\subsection*{Part E}
+Judge shopping is the act of making the same request to multiple judges until one of them agrees.
+
+Similarly, an official may approach a judge for a warrant for searching a house and continue attempting different judges until one agrees.
+
+\section*{Programming Question}
+\subsection*{Part 1}
+The worst case complexity of this form of attack is $O(NbW)$ where $W$ is the number of words per block, $b$ is the number of bytes per word, and $N$ is the number of blocks of input.
+
+The expected case complexity is half of the worst case complexity, ie. $O(\frac{NbW}{2})$.
+
+\subsection*{Part 2}
+% TODO: MAC first or something?
+
+\subsection*{Part 3}
+% TODO
+
+\subsection*{Part 4}
+% TODO
+
+\end{document}

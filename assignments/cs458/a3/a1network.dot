@@ -1,0 +1,32 @@
+digraph network {
+  margin="0 0 0 0";
+  rankdir="LR";
+
+  link [label="Internet Link"];
+  switch [label="Router / Switch"];
+  web0 [label="Web Server"];
+  web1 [label="Web Server"];
+  web2 [label="Web Server"];
+  file0 [label="File Server"];
+  file1 [label="File Server"];
+  db0 [label="Database"];
+  db1 [label="Database"];
+
+  link->switch;
+
+  switch->web0;
+  switch->web1;
+  switch->web2;
+
+  web0->file0;
+  web0->db0;
+
+  web1->file1;
+  web1->db0;
+
+  web2->file1;
+  web2->db1;
+
+  db0->db1->db0;
+  file0->file1->file0;
+}
