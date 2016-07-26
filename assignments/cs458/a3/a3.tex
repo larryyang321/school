@@ -104,12 +104,9 @@ The worst case complexity of this form of attack is $O(NbW)$ where $W$ is the nu
 The expected case complexity is half of the worst case complexity, ie. $O(\frac{NbW}{2})$.
 
 \subsection*{Part 2}
-% TODO: MAC first or something?
+This server could use encrypt-then-MAC. This would provide an increased level of integrity by preventing the leakage of the information required to do an oracle attack (ie. the 200/500 response).
 
 \subsection*{Part 3}
-% TODO
-
-\subsection*{Part 4}
-% TODO
+The relevant aspects that must change have to do with the padding; since our server uses a non-equal padding, the aspects of the attack that involve setting the padding must instead set it as incrementing values (eg. ``3214'' is a valid length-4 encoding).
 
 \end{document}

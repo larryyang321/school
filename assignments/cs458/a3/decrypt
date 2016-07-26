@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 import base64
-import requests
 import sys
+
+import requests
 
 
 URL = 'http://localhost:4555'
@@ -9,42 +10,44 @@ URL = 'http://localhost:4555'
 
 def main(cookie):
     cookie = base64.b64decode(cookie)
-    cookies = [cookie[i:i+16] for i in range(16, len(cookie), 16)]
+    cookies = [cookie[i:i+16] for i in range(0, len(cookie), 16)]
     plaintext = bytearray()
-    original_iv = cookie[:16]
 
-    for cookie in cookies:
-        iv = bytearray(16)
+    for idx, cookie in enumerate(cookies[1:]):
+        intermediary = bytearray(16)
 
         for i in range(15, -1, -1):
             code = 500
             while code != 200:
-                iv[i] += 1
-                if iv[i] > 255:
+                intermediary[i] += 1
+                if intermediary[i] > 255:
                     print 'ERROR: exceeded bounds of index {}'.format(i)
-                    print ''.join('{:02x}'.format(x) for x in iv)
+                    print ''.join('{:02x}'.format(x) for x in intermediary)
                     return
 
-                test_cookie = base64.b64encode(iv + cookie)
+                test_cookie = base64.b64encode(intermediary + cookie)
 
                 resp = requests.get(URL, cookies={'user': test_cookie})
                 code = resp.status_code
 
-            iv[-1] ^= (16 - i) ^ (16 - i + 1)
+            if i:
+                intermediary[-1] ^= (16 - i) ^ (16 - i + 1)
 
+        # print ''.join('{:02x}'.format(x) for x in intermediary)
         padding = bytearray(list(range(15, 0, -1)) + [16])
-        intermediate = bytearray(x ^ y for x, y in zip(iv, padding))
-        # print ''.join('{:02x}'.format(x) for x in intermediate)
+        intermediate = bytearray(x ^ y for x, y in zip(intermediary, padding))
 
-        plaintext += bytearray(x ^ y for x, y in zip(bytearray(original_iv),
+        plaintext += bytearray(x ^ y for x, y in zip(bytearray(cookies[idx]),
                                                      intermediate))
 
-    print ''.join(chr(x) for x in plaintext)
+    return ''.join(chr(x) for x in plaintext)
 
 
 if __name__ == '__main__':
     try:
-        main(sys.argv[1])
+        decoded = main(sys.argv[1])
     except IndexError:
         print 'usage: ./decrypt <cookie>'
         sys.exit(1)
+
+    print decoded
