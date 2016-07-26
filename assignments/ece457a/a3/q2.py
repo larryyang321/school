@@ -37,12 +37,6 @@ cities = [
 ]
 
 distances = [[0 for _ in enumerate(cities)] for _ in enumerate(cities)]
-for i, src in enumerate(cities):
-    for j, dest in enumerate(cities):
-        dist = ((src[0] - dest[0]) ** 2 + (src[1] - dest[1]) ** 2) ** (1/2.)
-        distances[i][j] = dist
-        distances[j][i] = dist
-
 pheromones = list()
 
 
@@ -100,14 +94,14 @@ class Ant:
         self.distance += distances[self.path[-1]][city]
         self.path.append(city)
 
-        self.pheromone_drop()
-
         if len(self.path) == len(cities):
             self.distance += distances[self.path[-1]][self.path[0]]
 
 
-def aco(num_ants=len(cities), online_update=True, q=100.0, rho=0.5,
-        iterations=100):
+def aco(num_ants=len(cities), online_update=True, alpha=1.0, beta=5.0, q=100.0,
+        rho=0.5, iterations=200):
+    Ant.ALPHA = alpha
+    Ant.BETA = beta
     Ant.Q = q
     Ant.RHO = rho
 
@@ -123,8 +117,17 @@ def aco(num_ants=len(cities), online_update=True, q=100.0, rho=0.5,
             for ant in ants:
                 ant.next_city()
 
-        if online_update:
             Ant.pheromone_evaporate()
+            if online_update:
+                # online pheromone drop
+                for ant in ants:
+                    ant.pheromone_drop()
+
+        # offline pheromone drop
+        best = sorted(ants, key=lambda ant: ant.distance)[0]
+        for i, src in enumerate(best.path):
+            dest = best.path[(i+1) % len(best.path)]
+            pheromones[src][dest] += Ant.Q / best.distance
 
         for ant in ants:
             if ant.distance < current:
@@ -139,19 +142,41 @@ def aco(num_ants=len(cities), online_update=True, q=100.0, rho=0.5,
 
     plot.title('Ant Colony Optimization')
     plot.grid(True)
-    plot.savefig('figs/q2/n{}-q{}-r{}{}.png'.format(
-        num_ants, Ant.Q, Ant.RHO, '-online' if online_update else ''))
+    plot.savefig('figs/q2/n{}-a{}-b{}-q{}-r{}{}.png'.format(
+        num_ants, Ant.ALPHA, Ant.BETA, Ant.Q, Ant.RHO,
+        '-online' if online_update else ''))
     plot.show()
 
 
+def init():
+    for i, src in enumerate(cities):
+        for j, dest in enumerate(cities):
+            dist = ((src[0] - dest[0]) ** 2 + (src[1] - dest[1]) ** 2) ** 0.5
+            distances[i][j] = dist
+            distances[j][i] = dist
+
 def main():
-    for q in (75.0, 100.0, 125.0):
-        for rho in (0.4, 0.5, 0.6):
-            for num_ants in (len(cities) - 5, len(cities), len(cities) + 5):
-                for online_update in (False, True):
-                    aco(num_ants=num_ants, online_update=online_update, q=q,
-                        rho=rho)
+    aco()
+
+    for alpha in (0.5, 1.0, 1.5, 2.0):
+        aco(alpha=alpha)
+
+    for beta in (3.0, 4.0, 5.0, 6.0):
+        aco(beta=beta)
+
+    for q in (80.0, 90.0, 100.0, 110.0):
+        aco(q=q)
+
+    for rho in (0.4, 0.5, 0.6, 0.7):
+        aco(rho=rho)
+
+    num_cities = len(cities)
+    for num_ants in (num_cities // 2, num_cities, num_cities * 2):
+        aco(num_ants=num_ants)
+
+    aco(online_update=False)
 
 
 if __name__ == '__main__':
+    init()
     main()

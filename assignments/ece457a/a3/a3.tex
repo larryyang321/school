@@ -1,0 +1,281 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,listings,parskip,custom}
+\usepackage[margin=.8in]{geometry}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+
+\title{ECE 457A --- Assignment 3}
+\author{Kevin Carruthers (20463098), Lara Janecka (20460089), and Josh Netterfield(TODO)}
+\date{\vspace{-2ex}Spring 2016}
+\maketitle\HRule
+
+\section*{Question 1}
+As you can see in the below code, we used \[ \frac{1}{ISE + t_r + t_s + M_p} \] as our fitness function and used a 3-tuple of the form $(K_p, T_i, T_d)$ as our solution representation.
+
+\lstinputlisting[language=python]{q1.py}
+
+\subsection*{Experiments}
+We found that a larger number of generations helped us to converge upon a better solution. Increasing the number of generations improved our solution logarithmically; that is, larger and larger generation count increases were required to see any difference in solution quality, as this value was increased.
+
+We found that larger populations tended to conerge to better results as well as converging faster than smaller populations. This is likely due to multiple factors: since populations were generated randomly, there was a larger chance of a ``very good'' solution existing in the initial population for the larger sets; and larger sets allowed for a wider range of crossover possibilities as well as more mutations per generation, which allowed us to find better solutions faster.
+
+Decreasing the mutation probability increased the probability that a child generation contained incremenental improvements over the parent generation. Without such a large mutation chance, it was unlikely that any very bad changes would occur (eg. mutating good solutions to very bad ones). Conversely, this prevented us from mutating to very good alternatives as often. Overall, this caused us to incrementally improve rather than jumping now and again, thus making us converge more reliably to a slightly suboptimal solution.
+
+Increasing the crossover probability allowed for a larger amount of genetic diversity between generations, thus letting us search the solution space more rapidly. Unfortunately, since these crossovers are randomly effective (ie. may be either good or bad with equal probability), this did not had a noticeable impact on solution quality. In fact, crossover probabilities over 70\% slightly declined in solution quality as the probability continued to rise.
+
+\section*{Question 2}
+\subsection*{a)}
+The more ants involved in the system. the faster the food was consumed. This is probably because there were more ants to carry the food back to the nest, but also because it gave more ants on a path so that there was less opportunity for the path to evaporate. As the diffusion rate increases the ants take less direct routes to the food because pheromones are more spread out. In a way this helps good paths persist, but it also allows bad paths to persist. More ants found their way to the known path since it was much wider. Evaporation rate increasing made paths disappear more quickly (by definition of evaporation) which helps get rid of bad paths but it also makes good paths disappear. This made getting a stream of ants going to the food source much harder. As would fit common sense the closer the food sources were to the nest the faster the ants found them.
+
+\subsection*{b)}
+\paragraph{Online Update}
+It is easy to see that turning off online updates dramatically increases the result returned from the algorithm. This happens consistently across all other parameters. By having the ants update the pheromones as they go other ants can see which paths are frequently taken because those pheromones have not evaporated as much due to other ants going there frequently.
+
+\paragraph{Population Size}
+The optimal population size is equal to the number of nodes in the system. Halving or doubling the population size worsens the results by roughly the same amount. Too few ants doesn't explore enough to find optimal solutions and too many ants keeps around bad solutions for longer.
+
+\paragraph{Transition Control Parameters}
+When a high priority was given to the cost (a beta of 1) the best results occurred. The best result (ignoring other factors) happened with alpha at 0.5 and beta at 1.0.
+
+\paragraph{Pheromone Persistence}
+On average the pheromone persistence decreasing improved the solution, but all numbers were very close and many scenarios showed different results. The effect of pheromone persistence impacts the algorithm in many ways and most likely interacts with the other parameters changed in unforseen ways. If all other parameters were left untouched decreasing the pheromone persistence improved the results slightly.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Population} & $\alpha$ & $\beta$ & $\rho$ & \textbf{Online Update} & \textbf{Results} \\ \hline
+14  &  0.2  &  0.2  &  0.4  &  False  &  18337.63\\ \hline
+14  &  0.2  &  0.2  &  0.4  &  True  &  16566.19\\ \hline
+29  &  0.2  &  0.2  &  0.4  &  False  &  19574.39\\ \hline
+29  &  0.2  &  0.2  &  0.4  &  True  &  15670.41\\ \hline
+58  &  0.2  &  0.2  &  0.4  &  False  &  16408.03\\ \hline
+58  &  0.2  &  0.2  &  0.4  &  True  &  16954.42\\ \hline
+14  &  0.2  &  0.2  &  0.5  &  False  &  20262.68\\ \hline
+14  &  0.2  &  0.2  &  0.5  &  True  &  16921.04\\ \hline
+29  &  0.2  &  0.2  &  0.5  &  False  &  17396.13\\ \hline
+29  &  0.2  &  0.2  &  0.5  &  True  &  17678.07\\ \hline
+58  &  0.2  &  0.2  &  0.5  &  False  &  20376.50\\ \hline
+58  &  0.2  &  0.2  &  0.5  &  True  &  16337.20\\ \hline
+14  &  0.2  &  0.2  &  0.6  &  False  &  20854.07\\ \hline
+14  &  0.2  &  0.2  &  0.6  &  True  &  17297.23\\ \hline
+29  &  0.2  &  0.2  &  0.6  &  False  &  20970.87\\ \hline
+29  &  0.2  &  0.2  &  0.6  &  True  &  16659.96\\ \hline
+58  &  0.2  &  0.2  &  0.6  &  False  &  21007.90\\ \hline
+58  &  0.2  &  0.2  &  0.6  &  True  &  15541.35\\ \hline
+14  &  0.2  &  0.5  &  0.4  &  False  &  19534.24\\ \hline
+14  &  0.2  &  0.5  &  0.4  &  True  &  13927.10\\ \hline
+29  &  0.2  &  0.5  &  0.4  &  False  &  18592.71\\ \hline
+29  &  0.2  &  0.5  &  0.4  &  True  &  13989.73\\ \hline
+58  &  0.2  &  0.5  &  0.4  &  False  &  15891.49\\ \hline
+58  &  0.2  &  0.5  &  0.4  &  True  &  12662.90\\ \hline
+14  &  0.2  &  0.5  &  0.5  &  False  &  19940.38\\ \hline
+14  &  0.2  &  0.5  &  0.5  &  True  &  14633.21\\ \hline
+29  &  0.2  &  0.5  &  0.5  &  False  &  17087.16\\ \hline
+29  &  0.2  &  0.5  &  0.5  &  True  &  13715.43\\ \hline
+58  &  0.2  &  0.5  &  0.5  &  False  &  17522.22\\ \hline
+58  &  0.2  &  0.5  &  0.5  &  True  &  12616.42\\ \hline
+14  &  0.2  &  0.5  &  0.6  &  False  &  19410.93\\ \hline
+14  &  0.2  &  0.5  &  0.6  &  True  &  12480.44\\ \hline
+29  &  0.2  &  0.5  &  0.6  &  False  &  19022.73\\ \hline
+29  &  0.2  &  0.5  &  0.6  &  True  &  14195.76\\ \hline
+58  &  0.2  &  0.5  &  0.6  &  False  &  17474.86\\ \hline
+58  &  0.2  &  0.5  &  0.6  &  True  &  13606.47\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Population} & $\alpha$ & $\beta$ & $\rho$ & \textbf{Online Update} & \textbf{Results} \\ \hline
+14  &  0.2  &  1  &  0.4  &  False  &  15031.67\\ \hline
+14  &  0.2  &  1  &  0.4  &  True  &  11363.22\\ \hline
+29  &  0.2  &  1  &  0.4  &  False  &  15537.26\\ \hline
+29  &  0.2  &  1  &  0.4  &  True  &  10992.08\\ \hline
+58  &  0.2  &  1  &  0.4  &  False  &  15423.03\\ \hline
+58  &  0.2  &  1  &  0.4  &  True  &  11767.54\\ \hline
+14  &  0.2  &  1  &  0.5  &  False  &  14692.25\\ \hline
+14  &  0.2  &  1  &  0.5  &  True  &  11853.55\\ \hline
+29  &  0.2  &  1  &  0.5  &  False  &  15852.97\\ \hline
+29  &  0.2  &  1  &  0.5  &  True  &  10895.31\\ \hline
+58  &  0.2  &  1  &  0.5  &  False  &  14471.73\\ \hline
+58  &  0.2  &  1  &  0.5  &  True  &  10972.35\\ \hline
+14  &  0.2  &  1  &  0.6  &  False  &  17601.23\\ \hline
+14  &  0.2  &  1  &  0.6  &  True  &  11764.21\\ \hline
+29  &  0.2  &  1  &  0.6  &  False  &  14922.29\\ \hline
+29  &  0.2  &  1  &  0.6  &  True  &  11209.51\\ \hline
+58  &  0.2  &  1  &  0.6  &  False  &  17107.36\\ \hline
+58  &  0.2  &  1  &  0.6  &  True  &  10233.41\\ \hline
+14  &  0.5  &  0.2  &  0.4  &  False  &  19392.16\\ \hline
+14  &  0.5  &  0.2  &  0.4  &  True  &  17163.70\\ \hline
+29  &  0.5  &  0.2  &  0.4  &  False  &  20670.55\\ \hline
+29  &  0.5  &  0.2  &  0.4  &  True  &  16474.81\\ \hline
+58  &  0.5  &  0.2  &  0.4  &  False  &  18566.24\\ \hline
+58  &  0.5  &  0.2  &  0.4  &  True  &  15605.49\\ \hline
+14  &  0.5  &  0.2  &  0.5  &  False  &  22466.62\\ \hline
+14  &  0.5  &  0.2  &  0.5  &  True  &  17504.21\\ \hline
+29  &  0.5  &  0.2  &  0.5  &  False  &  21304.09\\ \hline
+29  &  0.5  &  0.2  &  0.5  &  True  &  15911.41\\ \hline
+58  &  0.5  &  0.2  &  0.5  &  False  &  20048.64\\ \hline
+58  &  0.5  &  0.2  &  0.5  &  True  &  15285.49\\ \hline
+14  &  0.5  &  0.2  &  0.6  &  False  &  22375.40\\ \hline
+14  &  0.5  &  0.2  &  0.6  &  True  &  17099.74\\ \hline
+29  &  0.5  &  0.2  &  0.6  &  False  &  20992.87\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Population} & $\alpha$ & $\beta$ & $\rho$ & \textbf{Online Update} & \textbf{Results} \\ \hline
+29  &  0.5  &  0.2  &  0.6  &  True  &  16029.04\\ \hline
+58  &  0.5  &  0.2  &  0.6  &  False  &  21335.11\\ \hline
+58  &  0.5  &  0.2  &  0.6  &  True  &  15367.47\\ \hline
+14  &  0.5  &  0.5  &  0.4  &  False  &  20943.39\\ \hline
+14  &  0.5  &  0.5  &  0.4  &  True  &  13677.20\\ \hline
+29  &  0.5  &  0.5  &  0.4  &  False  &  21299.74\\ \hline
+29  &  0.5  &  0.5  &  0.4  &  True  &  12905.51\\ \hline
+58  &  0.5  &  0.5  &  0.4  &  False  &  18758.41\\ \hline
+58  &  0.5  &  0.5  &  0.4  &  True  &  12687.44\\ \hline
+14  &  0.5  &  0.5  &  0.5  &  False  &  20836.13\\ \hline
+14  &  0.5  &  0.5  &  0.5  &  True  &  13967.00\\ \hline
+29  &  0.5  &  0.5  &  0.5  &  False  &  19406.14\\ \hline
+29  &  0.5  &  0.5  &  0.5  &  True  &  13443.38\\ \hline
+58  &  0.5  &  0.5  &  0.5  &  False  &  17404.35\\ \hline
+58  &  0.5  &  0.5  &  0.5  &  True  &  12795.15\\ \hline
+14  &  0.5  &  0.5  &  0.6  &  False  &  20219.60\\ \hline
+14  &  0.5  &  0.5  &  0.6  &  True  &  14422.00\\ \hline
+29  &  0.5  &  0.5  &  0.6  &  False  &  21767.44\\ \hline
+29  &  0.5  &  0.5  &  0.6  &  True  &  13973.77\\ \hline
+58  &  0.5  &  0.5  &  0.6  &  False  &  17162.62\\ \hline
+58  &  0.5  &  0.5  &  0.6  &  True  &  12169.47\\ \hline
+14  &  0.5  &  1  &  0.4  &  False  &  15411.45\\ \hline
+14  &  0.5  &  1  &  0.4  &  True  &  10985.88\\ \hline
+29  &  0.5  &  1  &  0.4  &  False  &  16624.10\\ \hline
+29  &  0.5  &  1  &  0.4  &  True  &  10561.25\\ \hline
+58  &  0.5  &  1  &  0.4  &  False  &  15884.95\\ \hline
+58  &  0.5  &  1  &  0.4  &  True  &  10632.56\\ \hline
+14  &  0.5  &  1  &  0.5  &  False  &  20789.21\\ \hline
+14  &  0.5  &  1  &  0.5  &  True  &  10274.18\\ \hline
+29  &  0.5  &  1  &  0.5  &  False  &  18778.58\\ \hline
+29  &  0.5  &  1  &  0.5  &  True  &  10629.98\\ \hline
+58  &  0.5  &  1  &  0.5  &  False  &  17271.67\\ \hline
+58  &  0.5  &  1  &  0.5  &  True  &  10312.21\\ \hline
+14  &  0.5  &  1  &  0.6  &  False  &  18980.60\\ \hline
+14  &  0.5  &  1  &  0.6  &  True  &  12221.63\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\textbf{Population} & $\alpha$ & $\beta$ & $\rho$ & \textbf{Online Update} & \textbf{Results} \\ \hline
+\hline
+29  &  0.5  &  1  &  0.6  &  False  &  17826.65\\ \hline
+29  &  0.5  &  1  &  0.6  &  True  &  10399.40\\ \hline
+58  &  0.5  &  1  &  0.6  &  False  &  17759.04\\ \hline
+58  &  0.5  &  1  &  0.6  &  True  &  9828.38\\ \hline
+14  &  1  &  0.2  &  0.4  &  False  &  23579.55\\ \hline
+14  &  1  &  0.2  &  0.4  &  True  &  12416.16\\ \hline
+29  &  1  &  0.2  &  0.4  &  False  &  21902.39\\ \hline
+29  &  1  &  0.2  &  0.4  &  True  &  13568.60\\ \hline
+58  &  1  &  0.2  &  0.4  &  False  &  19702.01\\ \hline
+58  &  1  &  0.2  &  0.4  &  True  &  13318.36\\ \hline
+14  &  1  &  0.2  &  0.5  &  False  &  21915.70\\ \hline
+14  &  1  &  0.2  &  0.5  &  True  &  15779.26\\ \hline
+29  &  1  &  0.2  &  0.5  &  False  &  20766.72\\ \hline
+29  &  1  &  0.2  &  0.5  &  True  &  14827.21\\ \hline
+58  &  1  &  0.2  &  0.5  &  False  &  20717.86\\ \hline
+58  &  1  &  0.2  &  0.5  &  True  &  13126.70\\ \hline
+14  &  1  &  0.2  &  0.6  &  False  &  23306.44\\ \hline
+14  &  1  &  0.2  &  0.6  &  True  &  15177.89\\ \hline
+29  &  1  &  0.2  &  0.6  &  False  &  20721.19\\ \hline
+29  &  1  &  0.2  &  0.6  &  True  &  14991.20\\ \hline
+58  &  1  &  0.2  &  0.6  &  False  &  20968.91\\ \hline
+58  &  1  &  0.2  &  0.6  &  True  &  14118.81\\ \hline
+14  &  1  &  0.5  &  0.4  &  False  &  21165.24\\ \hline
+14  &  1  &  0.5  &  0.4  &  True  &  12999.67\\ \hline
+29  &  1  &  0.5  &  0.4  &  False  &  20737.04\\ \hline
+29  &  1  &  0.5  &  0.4  &  True  &  12655.52\\ \hline
+58  &  1  &  0.5  &  0.4  &  False  &  18531.51\\ \hline
+58  &  1  &  0.5  &  0.4  &  True  &  10570.19\\ \hline
+14  &  1  &  0.5  &  0.5  &  False  &  20279.46\\ \hline
+14  &  1  &  0.5  &  0.5  &  True  &  13297.68\\ \hline
+29  &  1  &  0.5  &  0.5  &  False  &  19027.07\\ \hline
+29  &  1  &  0.5  &  0.5  &  True  &  12623.29\\ \hline
+58  &  1  &  0.5  &  0.5  &  False  &  18996.70\\ \hline
+58  &  1  &  0.5  &  0.5  &  True  &  10830.24\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\textbf{Population} & $\alpha$ & $\beta$ & $\rho$ & \textbf{Online Update} & \textbf{Results} \\ \hline
+\hline
+14  &  1  &  0.5  &  0.6  &  False  &  20555.52\\ \hline
+14  &  1  &  0.5  &  0.6  &  True  &  14694.90\\ \hline
+29  &  1  &  0.5  &  0.6  &  False  &  19880.49\\ \hline
+29  &  1  &  0.5  &  0.6  &  True  &  12730.41\\ \hline
+58  &  1  &  0.5  &  0.6  &  False  &  20191.40\\ \hline
+58  &  1  &  0.5  &  0.6  &  True  &  10523.57\\ \hline
+14  &  1  &  1  &  0.4  &  False  &  19025.60\\ \hline
+14  &  1  &  1  &  0.4  &  True  &  12189.47\\ \hline
+29  &  1  &  1  &  0.4  &  False  &  16947.01\\ \hline
+29  &  1  &  1  &  0.4  &  True  &  10596.86\\ \hline
+58  &  1  &  1  &  0.4  &  False  &  17674.81\\ \hline
+58  &  1  &  1  &  0.4  &  True  &  9550.16\\ \hline
+14  &  1  &  1  &  0.5  &  False  &  18754.49\\ \hline
+14  &  1  &  1  &  0.5  &  True  &  12786.51\\ \hline
+29  &  1  &  1  &  0.5  &  False  &  16884.34\\ \hline
+29  &  1  &  1  &  0.5  &  True  &  10682.14\\ \hline
+58  &  1  &  1  &  0.5  &  False  &  17434.08\\ \hline
+58  &  1  &  1  &  0.5  &  True  &  9482.06\\ \hline
+14  &  1  &  1  &  0.6  &  False  &  18089.12\\ \hline
+14  &  1  &  1  &  0.6  &  True  &  13643.01\\ \hline
+29  &  1  &  1  &  0.6  &  False  &  18114.10\\ \hline
+29  &  1  &  1  &  0.6  &  True  &  10752.34\\ \hline
+58  &  1  &  1  &  0.6  &  False  &  17920.17\\ \hline
+58  &  1  &  1  &  0.6  &  True  &  9236.25\\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{Code}
+Given the below code, we noticed the following effects:
+\begin{itemize}
+\item increasing the pheromone persistance constant made ants more likely to continue tracing the same paths, even if they were suboptimal, rather than exploring new options. Above a certain threshold (around $q=100$) this decreased the quality of our solutions. The sweet spot appeared to be slightly below this value, eg. $\approx 95$.
+\item modifying the state transition control parameter changed how the ants weighed the relative distance vs pheromone ratio. We found that a 5:1 weighting of distance to pheromones gave the best results. Increasing the weighting of pheromones made ants unwilling to explore new paths and thus prevented us from exploring alternative answers and increasing the weighting of distance made ants completely avoid certain paths that had the potential to lead to very good solutions.
+\item increasing the population size generally led to better solutions as more potential paths were explored. After increasing this value to roughly 30, no noticeable improvements were seen. We theorize that having a population size equal to the number of cities (29) is optimal.
+\item disabling online updates dramatically decreased the quality of the solution
+\end{itemize}
+
+\lstinputlisting[language=python]{q2.py}
+
+\section*{Question 3}
+\subsection*{a)}
+% TODO (josh)
+
+\subsection*{Code}
+As you can see in the below code, our algorithm was a standard cognitive-social PSO algorithm using cognitive-social relative constriction and no inertia. By default, our algorithm used globally-best particles to converge and had very low velocity constraints.
+
+\lstinputlisting[language=python]{q3.py}
+
+We noticed the following effects upon performing some variations:
+\begin{itemize}
+\item The Inertia Weight with Global Best equation tended toward very high velocities and thus particles jumping around space early on. Though this algorithm gave us the best results, the final swarm locations were quite far away from the ideal solution -- effectively, this algorithm overshot the final answer due to having too high of a velocity early on and then became ``stuck'' in place as the inertia increased. Tuning the initial inertia may allow the swarm to settle into a better final position.
+\item The $V_{max}$ with Global Best algorithm had very good results, second only to the Inertia Weight algorithm. Additionally, this algorithm tended to keep the swarm closer together, the particles' final locations being in two large clumps (one of which was around the optimal solution). This algorithm converged well making constant strides towards the optimal solution with each step.
+\item The Constriction Factor with Global Best algorithm gave us the worst solution: by modifying the constriction constant either above or below 1, we caused our particles to move either too slowly or too quickly, respectively, and thus prevented them from following any real swarm intelligence. Modifying this value by a much smaller amount may provide more beneficial results, but it is unlikely this level of tuning is worthwhile (ie. constriction $= \pm 0.001$).
+\item The Inertia Weight with Neighbourhood Best algorithm operated quite similarly to the Inertia Weight with Global Best algorithm; the chief difference was that this form of the algorithm tended to keep particles closer together (ie. in swarms). The solution quality did not noticeably differ.
+\item The $V_{max}$ with Neighbourhood Best algorithm converged into three swarms rather than the Global version's two swarms. The final solution did not appear to be noticeably different, though these swarms were closer to the best solution at the final iteration.
+\item The Constriction Factor with Neighbourhood Best algorithm converged better than its global counterpart, but still resulted in a significantly worse solution than the other above algorithms. Mostly, this algorithm failed to produce any real swarms and instead distributed particles across the solution space, finding its best solution mostly by luck.
+\item Modifying the seed value showed us that our algorithms had a general variance of around $\pm 0.1$. On the whole, our above observations hold, though some seeds may allow algorithms with similar solutions (ie. Global $V_{max}$ and Global Inertia) to overtake eachother.
+\end{itemize}
+
+\section*{Group Work Division}
+The division of work was roughly equal between all three group members.
+
+\end{document}
