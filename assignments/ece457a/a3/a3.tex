@@ -256,8 +256,172 @@ Given the below code, we noticed the following effects:
 \lstinputlisting[language=python]{q2.py}
 
 \section*{Question 3}
-\subsection*{a)}
-% TODO (josh)
+\subsection*{a.i)}
+
+The following simulations were done in NetLogo 5.3.1, using the Particle Swarm Optimization sample by Uri Wilensky. The ``Speed of convergence'' column refers to the number of ticks required before either the global optima was found or 90\% of the particles were close (less than 10\% of the screen width) to one or more local optima.
+
+First, we considered the effect of population size on convergence and ability to find a good optima. A preference for personal best of 2.0 and a particle speed limit of 5 was used. Although it would be possible to look at a range of values, only two population sizes (20 and 80) were studied in order to use averages and standard deviations for a more quantitative analysis.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\textbf{Population Size} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
+\hline
+30 & 41 & 1 & 1 \\ \hline
+30 & $\approx$40 & 0.9959 & 1 \\ \hline
+30 & $\approx$40 & 0.9393 & 1 \\ \hline
+30 & 60 & 1 & 1 \\ \hline
+30 & 86 & 1 & 1 \\ \hline
+30 & $\approx$30 & 0.9779 & 1 \\ \hline
+30 & 21 & 1 & 1 \\ \hline
+30 & 20 & 1 & 1 \\ \hline
+30 & $\approx$50 & 0.9073 & 1 \\ \hline
+30 & $\approx$40 & 0.9004 & 1 \\ \hline
+30 & $\approx$40 & 0.971 & 1 \\ \hline
+30 & 40 & 1 & 1 \\ \hline
+30 & 74 & 1 & 1 \\ \hline
+30 & 91 & 1 & 1 \\ \hline
+30 & $\approx$50 & 0.9134 & 1 \\ \hline
+30 & 73 & 1 & 1 \\ \hline
+30 & $\approx$40 & 0.9145 & 1 \\ \hline
+30 & $\approx$60 & 0.9535 & 1 \\ \hline
+30 & 105 & 1 & 1 \\ \hline
+30 & $\approx$100 & 0.8878 & 1 \\ \hline
+80 & 108 & 1 & 1 \\ \hline
+80 & 33 & 1 & 1 \\ \hline
+80 & $\approx$100 & 0.9535 & 1 \\ \hline
+80 & 32 & 1 & 1 \\ \hline
+80 & 26 & 1 & 1 \\ \hline
+80 & $\approx$60 & 0.9759 & 1 \\ \hline
+80 & 43 & 1 & 1 \\ \hline
+80 & $\approx$60 & 0.9653 & 1 \\ \hline
+80 & $\approx$37 & 1 & 1 \\ \hline
+80 & 26 & 1 & 1 \\ \hline
+80 & $\approx$50 & 0.967 & 1 \\ \hline
+80 & $\approx$57 & 0.9963 & 1 \\ \hline
+80 & $\approx$50 & 0.9149 & 1 \\ \hline
+80 & $\approx$40 & 0.9577 & 1 \\ \hline
+80 & 41 & 1 & 1 \\ \hline
+80 & 107 & 1 & 1 \\ \hline
+80 & 41 & 1 & 1 \\ \hline
+80 & 55 & 1 & 1 \\ \hline
+80 & 136 & 1 & 1 \\ \hline
+80 & $\approx$100 & 0.9668 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+The average number of ticks until convergence for a population of size 20 was 55.05, with a sample standard deviation of 25.3.
+The average number of ticks until convergence for a population of size 80 was 60.1, with a sample standard deviation of 32.0.
+
+The average detected optima at convergence for a population of size 20 was 0.968, with a sample standard deviation of 0.04 (50% found the global optima).
+The average detected optima at convergence for a population of size 80 was 0.984, with a sample standard deviation of 0.02 (60% found the global optima).
+
+A larger sample size in this case resulted in reliably better solutions.
+Larger sample sizes resulted in a convergence time that was larger and had more variance.
+
+Next, we considered the effect of speed limits on a population of size 50 and a preference for personal best of 2.0:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\textbf{Speed Limit} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
+\hline
+30 & 41 & 1 & 1 \\ \hline
+30 & $\approx$40 & 0.9959 & 1 \\ \hline
+30 & $\approx$40 & 0.9393 & 1 \\ \hline
+30 & 60 & 1 & 1 \\ \hline
+30 & 86 & 1 & 1 \\ \hline
+30 & $\approx$30 & 0.9779 & 1 \\ \hline
+30 & 21 & 1 & 1 \\ \hline
+30 & 20 & 1 & 1 \\ \hline
+30 & $\approx$50 & 0.9073 & 1 \\ \hline
+30 & $\approx$40 & 0.9004 & 1 \\ \hline
+30 & $\approx$40 & 0.971 & 1 \\ \hline
+30 & 40 & 1 & 1 \\ \hline
+30 & 74 & 1 & 1 \\ \hline
+30 & 91 & 1 & 1 \\ \hline
+30 & $\approx$50 & 0.9134 & 1 \\ \hline
+30 & 73 & 1 & 1 \\ \hline
+30 & $\approx$40 & 0.9145 & 1 \\ \hline
+30 & $\approx$60 & 0.9535 & 1 \\ \hline
+30 & 105 & 1 & 1 \\ \hline
+30 & $\approx$100 & 0.8878 & 1 \\ \hline
+80 & 108 & 1 & 1 \\ \hline
+80 & 33 & 1 & 1 \\ \hline
+80 & $\approx$100 & 0.9535 & 1 \\ \hline
+80 & 32 & 1 & 1 \\ \hline
+80 & 26 & 1 & 1 \\ \hline
+80 & $\approx$60 & 0.9759 & 1 \\ \hline
+80 & 43 & 1 & 1 \\ \hline
+80 & $\approx$60 & 0.9653 & 1 \\ \hline
+80 & $\approx$37 & 1 & 1 \\ \hline
+80 & 26 & 1 & 1 \\ \hline
+80 & $\approx$50 & 0.967 & 1 \\ \hline
+80 & $\approx$57 & 0.9963 & 1 \\ \hline
+80 & $\approx$50 & 0.9149 & 1 \\ \hline
+80 & $\approx$40 & 0.9577 & 1 \\ \hline
+80 & 41 & 1 & 1 \\ \hline
+80 & 107 & 1 & 1 \\ \hline
+80 & 41 & 1 & 1 \\ \hline
+80 & 55 & 1 & 1 \\ \hline
+80 & 136 & 1 & 1 \\ \hline
+80 & $\approx$100 & 0.9668 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+The average number of ticks until convergence with speed limit 2 was 66.6, with a sample standard deviation of 23.5.
+The average number of ticks until convergence with speed limit 6 was 70.8, with a sample standard deviation of 32.1.
+
+The average detected optima at convergence with speed limit 2 was 0.971, with a sample standard deviation of 0.03.
+The average detected optima at convergence with speed limit 6 was 0.986, with a sample standard deviation of 0.03.
+
+In this case, a speed limit of 6 resulted in better solutions that converge slower.
+
+Qualitatively, low-speed-limit runs tended to fixate on local optima for longer, whereas high-speed-limit runs sometimes sped past the global optima.
+
+Finally, we consider the effect of a preference for personal best. Only two values were used, for the same reasons as we only used two values for population size. It would be interesting to see if certain values in between 1.5 and 1.7 are more effective.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\textbf{Personal best} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
+\hline
+1.7 & 51 & 1 & 1 \\ \hline
+1.7 & $\approx$70 & 0.9144 & 1 \\ \hline
+1.7 & $\approx$47 & 0.8716 & 1 \\ \hline
+1.7 & $\approx$60 & 0.8724 & 1 \\ \hline
+1.7 & 115 & 1 & 1 \\ \hline
+1.7 & $\approx$60 & 0.9902 & 1 \\ \hline
+1.7 & $\approx$70 & 0.9049 & 1 \\ \hline
+1.7 & $\approx$70 & 0.8349 & 1 \\ \hline
+1.7 & 13 & 1 & 1 \\ \hline
+1.7 & 26 & 1 & 1 \\ \hline
+1.5 & 73 & 1 & 1 \\ \hline
+1.5 & $\approx$46 & 0.9952 & 1 \\ \hline
+1.5 & $\approx$46 & 0.9481 & 1 \\ \hline
+1.5 & $\approx$56 & (2 & locals) & 0.952 & 1 \\ \hline
+1.5 & $\approx$56 & 0.9234 & 1 \\ \hline
+1.5 & 23 & 1 & 1 \\ \hline
+1.5 & $\approx$45 & 0.877 & 1 \\ \hline
+1.5 & 42 & 1 & 1 \\ \hline
+1.5 & $\approx$56 & 0.9151 & 1 \\ \hline
+1.5 & $\approx$45 & 1 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+The average number of ticks until convergence with a preference for personal best of 1.7 was 58.2, with a sample standard deviation of 27.7.
+The average number of ticks until convergence with a preference for personal best of 1.5 was 48.8, with a sample standard deviation of 12.9.
+
+The average detected optima at convergence with a preference for personal best of 1.7 was 0.939, with a sample standard deviation of 0.07.
+The average detected optima at convergence with a preference for personal best of 1.5 was 0.961, with a sample standard deviation of 0.04.
+
+In this case, a preference for personal best of 1.5 converged faster and more reliably, in less time.
+
+\subsection*{a.ii)}
+
+In classical PSO, there is no inertia term (i.e., the past direction and speed of a particle does not affect its future direction and speed). This algorithm adds a user-selectable inertia value. The changes in the x and y direction of every turn are scaled by (1 - inertia). This change can be seen on lines 116-116 and lines 122-123. The change in the UI can be seen by the existance of a particle inertia slider. Classical PSO can be simulated by setting particle inertia to 0, resulting in a less smooth and predictable simulation.
+
+Classical PSO finds solutions in about the same amount of time, but does not ever converge to the same degree as PSO with inertia.
 
 \subsection*{Code}
 As you can see in the below code, our algorithm was a standard cognitive-social PSO algorithm using cognitive-social relative constriction and no inertia. By default, our algorithm used globally-best particles to converge and had very low velocity constraints.
