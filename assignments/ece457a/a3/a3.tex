@@ -7,7 +7,7 @@
 \begin{document}
 
 \title{ECE 457A --- Assignment 3}
-\author{Kevin Carruthers (20463098), Lara Janecka (20460089), and Josh Netterfield(TODO)}
+\author{Kevin Carruthers (20463098), Lara Janecka (20460089), and Josh Netterfield (20461750)}
 \date{\vspace{-2ex}Spring 2016}
 \maketitle\HRule
 
@@ -257,7 +257,6 @@ Given the below code, we noticed the following effects:
 
 \section*{Question 3}
 \subsection*{a.i)}
-
 The following simulations were done in NetLogo 5.3.1, using the Particle Swarm Optimization sample by Uri Wilensky. The ``Speed of convergence'' column refers to the number of ticks required before either the global optima was found or 90\% of the particles were close (less than 10\% of the screen width) to one or more local optima.
 
 First, we considered the effect of population size on convergence and ability to find a good optima. A preference for personal best of 2.0 and a particle speed limit of 5 was used. Although it would be possible to look at a range of values, only two population sizes (20 and 80) were studied in order to use averages and standard deviations for a more quantitative analysis.
@@ -265,6 +264,7 @@ First, we considered the effect of population size on convergence and ability to
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
+\hline
 \textbf{Population Size} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
 \hline
 30 & 41 & 1 & 1 \\ \hline
@@ -311,12 +311,15 @@ First, we considered the effect of population size on convergence and ability to
 \end{table}
 
 The average number of ticks until convergence for a population of size 20 was 55.05, with a sample standard deviation of 25.3.
+
 The average number of ticks until convergence for a population of size 80 was 60.1, with a sample standard deviation of 32.0.
 
-The average detected optima at convergence for a population of size 20 was 0.968, with a sample standard deviation of 0.04 (50% found the global optima).
-The average detected optima at convergence for a population of size 80 was 0.984, with a sample standard deviation of 0.02 (60% found the global optima).
+The average detected optima at convergence for a population of size 20 was 0.968, with a sample standard deviation of 0.04 (50\% found the global optima).
+
+The average detected optima at convergence for a population of size 80 was 0.984, with a sample standard deviation of 0.02 (60\% found the global optima).
 
 A larger sample size in this case resulted in reliably better solutions.
+
 Larger sample sizes resulted in a convergence time that was larger and had more variance.
 
 Next, we considered the effect of speed limits on a population of size 50 and a preference for personal best of 2.0:
@@ -324,6 +327,7 @@ Next, we considered the effect of speed limits on a population of size 50 and a 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
+\hline
 \textbf{Speed Limit} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
 \hline
 30 & 41 & 1 & 1 \\ \hline
@@ -370,9 +374,11 @@ Next, we considered the effect of speed limits on a population of size 50 and a 
 \end{table}
 
 The average number of ticks until convergence with speed limit 2 was 66.6, with a sample standard deviation of 23.5.
+
 The average number of ticks until convergence with speed limit 6 was 70.8, with a sample standard deviation of 32.1.
 
 The average detected optima at convergence with speed limit 2 was 0.971, with a sample standard deviation of 0.03.
+
 The average detected optima at convergence with speed limit 6 was 0.986, with a sample standard deviation of 0.03.
 
 In this case, a speed limit of 6 resulted in better solutions that converge slower.
@@ -384,6 +390,7 @@ Finally, we consider the effect of a preference for personal best. Only two valu
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
+\hline
 \textbf{Personal best} & Speed of convergence & Detected Optima & Actual Optima \\ \hline
 \hline
 1.7 & 51 & 1 & 1 \\ \hline
@@ -399,7 +406,7 @@ Finally, we consider the effect of a preference for personal best. Only two valu
 1.5 & 73 & 1 & 1 \\ \hline
 1.5 & $\approx$46 & 0.9952 & 1 \\ \hline
 1.5 & $\approx$46 & 0.9481 & 1 \\ \hline
-1.5 & $\approx$56 & (2 & locals) & 0.952 & 1 \\ \hline
+1.5 & $\approx$56 & (2 \& locals) & 0.952 & 1 \\ \hline
 1.5 & $\approx$56 & 0.9234 & 1 \\ \hline
 1.5 & 23 & 1 & 1 \\ \hline
 1.5 & $\approx$45 & 0.877 & 1 \\ \hline
@@ -410,15 +417,16 @@ Finally, we consider the effect of a preference for personal best. Only two valu
 \end{table}
 
 The average number of ticks until convergence with a preference for personal best of 1.7 was 58.2, with a sample standard deviation of 27.7.
+
 The average number of ticks until convergence with a preference for personal best of 1.5 was 48.8, with a sample standard deviation of 12.9.
 
 The average detected optima at convergence with a preference for personal best of 1.7 was 0.939, with a sample standard deviation of 0.07.
+
 The average detected optima at convergence with a preference for personal best of 1.5 was 0.961, with a sample standard deviation of 0.04.
 
 In this case, a preference for personal best of 1.5 converged faster and more reliably, in less time.
 
 \subsection*{a.ii)}
-
 In classical PSO, there is no inertia term (i.e., the past direction and speed of a particle does not affect its future direction and speed). This algorithm adds a user-selectable inertia value. The changes in the x and y direction of every turn are scaled by (1 - inertia). This change can be seen on lines 116-116 and lines 122-123. The change in the UI can be seen by the existance of a particle inertia slider. Classical PSO can be simulated by setting particle inertia to 0, resulting in a less smooth and predictable simulation.
 
 Classical PSO finds solutions in about the same amount of time, but does not ever converge to the same degree as PSO with inertia.
